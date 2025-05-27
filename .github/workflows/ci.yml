@@ -9,8 +9,11 @@ on:
     branches: [main, master]
 
 jobs:
-  build-and-test:
+  backend:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
       - name: Checkout code
@@ -19,12 +22,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # or whatever version you support
+          python-version: '3.9'
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: '1.8.2' # or latest Poetry
+          poetry-version: '1.8.2'
 
       - name: Install dependencies
         run: poetry install
@@ -52,3 +55,30 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
         continue-on-error: true
+  
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build project
+        run: npm run build
