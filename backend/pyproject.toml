@@ -3,6 +3,7 @@ name = "weather_project"
 version = "0.1.0"
 description = "Build a full-stack weather application that provides real-time weather information and a 5-day forecast based on user input or current location."
 authors = ["Nabin Kim <nabinkim0318@gmail.com>"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
