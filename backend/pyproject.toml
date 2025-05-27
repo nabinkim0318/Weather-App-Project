@@ -1,0 +1,16 @@
+[project]
+name = "weather-project"
+version = "0.1.0"
+description = "Build a full-stack weather application that provides real-time weather information and a 5-day forecast based on user input or current location, demonstrating both technical ability and user-centered design. The goal is to showcase full-stack engineering skills, effective API integration, and clean, responsive UI/UX that adapts to all device types."
+authors = [
+    {name = "Nabin Kim",email = "nabinkim0318@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
