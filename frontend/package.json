@@ -2,9 +2,10 @@
     "name": "weather-app-frontend",
     "version": "0.1.0",
     "private": true,
-    "dependencies": {},
     "scripts": {
-        "lint": "eslint src"
+        "format": "prettier --write src"
+    },
+    "devDependencies": {
+        "prettier": "^3.5.3"
     }
-  }
-  
+}
