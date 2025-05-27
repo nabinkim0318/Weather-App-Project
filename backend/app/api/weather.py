@@ -1,23 +1,18 @@
-import os
-
-import requests
-from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, Query
-
-load_dotenv()
+from fastapi import APIRouter, Query
+from app.services.weather_service import fetch_current_weather, fetch_forecast
 
 router = APIRouter()
 
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-
-
 @router.get("/weather")
-def get_weather(city: str = Query(...)):
-    url = f"https://api.openweathermap.org/data/2.5/weather"
-    params = {"q": city, "appid": OPENWEATHER_API_KEY, "units": "metric"}
-    resp = requests.get(url, params=params)
-    if resp.status_code != 200:
-        raise HTTPException(
-            status_code=resp.status_code, detail=resp.json().get("message")
-        )
-    return resp.json()
+def get_weather(city: str = Query(None), lat: float = Query(None), lon: float = Query(None)):
+    result = fetch_current_weather(city, lat, lon)
+    if not result:
+        return {"detail": "Weather not found."}
+    return result
+
+@router.get("/forecast")
+def get_forecast(city: str = Query(None), lat: float = Query(None), lon: float = Query(None)):
+    result = fetch_forecast(city, lat, lon)
+    if not result:
+        return {"detail": "Forecast not found."}
+    return result
