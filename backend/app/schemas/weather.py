@@ -1,22 +1,26 @@
-from typing import Optional, List, Literal
-from datetime import date, time, datetime
+from datetime import date, datetime, time
+from typing import List, Literal, Optional
+
 from pydantic import BaseModel
 
 # --------------------------
 # Weather "Current" Response
 # --------------------------
 
+
 class WeatherBase(BaseModel):
-    city: Optional[str]        # Geocoding API로 보완
-    country: Optional[str]     # Geocoding API로 보완
+    city: Optional[str]  # Geocoding API로 보완
+    country: Optional[str]  # Geocoding API로 보완
     latitude: float
     longitude: float
 
+
 class WeatherCondition(BaseModel):
-    id: int                   # weather code
-    main: str                 # e.g., "Clouds"
-    description: str          # e.g., "broken clouds"
-    icon: str                 # e.g., "04d"
+    id: int  # weather code
+    main: str  # e.g., "Clouds"
+    description: str  # e.g., "broken clouds"
+    icon: str  # e.g., "04d"
+
 
 class WeatherCurrent(BaseModel):
     temp_c: float
@@ -25,27 +29,30 @@ class WeatherCurrent(BaseModel):
     wind_speed: float
     wind_deg: Optional[float]
     wind_gust: Optional[float]
-    condition: str            # e.g., "Clouds"
-    condition_desc: str       # e.g., "broken clouds"
-    icon: str                 # e.g., "04d"
-    icon_url: Optional[str]   # 완성형 아이콘 URL (optional)
+    condition: str  # e.g., "Clouds"
+    condition_desc: str  # e.g., "broken clouds"
+    icon: str  # e.g., "04d"
+    icon_url: Optional[str]  # 완성형 아이콘 URL (optional)
     sunrise: Optional[datetime]
     sunset: Optional[datetime]
     pressure: Optional[float]
     visibility: Optional[float]
-    precipitation: Optional[float]   # rain.1h or snow.1h 등
-    precipitation_type: Optional[Literal['rain', 'snow']]  # 강수 종류
+    precipitation: Optional[float]  # rain.1h or snow.1h 등
+    precipitation_type: Optional[Literal["rain", "snow"]]  # 강수 종류
     uvi: Optional[float]
-    updated_at: datetime              # current.dt 기준
-    weather_code: Optional[int]       # weather.id
+    updated_at: datetime  # current.dt 기준
+    weather_code: Optional[int]  # weather.id
+
 
 class WeatherResponse(BaseModel):
     location: WeatherBase
     weather: WeatherCurrent
 
+
 # --------------------------
 # Forecast Response
 # --------------------------
+
 
 class ForecastItem(BaseModel):
     forecast_date: date
@@ -57,7 +64,7 @@ class ForecastItem(BaseModel):
     icon: str
     icon_url: Optional[str]
     precipitation: Optional[float]
-    precipitation_type: Optional[Literal['rain', 'snow']]
+    precipitation_type: Optional[Literal["rain", "snow"]]
     uvi: Optional[float]
     pressure: Optional[float]
     wind_speed: Optional[float]
@@ -68,13 +75,16 @@ class ForecastItem(BaseModel):
     weather_code: Optional[int]
     updated_at: datetime
 
+
 class ForecastResponse(BaseModel):
     location: WeatherBase
     forecast: List[ForecastItem]
 
+
 # --------------------------
 # WeatherHistory (for DB fetch)
 # --------------------------
+
 
 class WeatherHistoryOut(BaseModel):
     id: int
@@ -95,7 +105,7 @@ class WeatherHistoryOut(BaseModel):
     pressure: Optional[float]
     visibility: Optional[float]
     precipitation: Optional[float]
-    precipitation_type: Optional[Literal['rain', 'snow']]
+    precipitation_type: Optional[Literal["rain", "snow"]]
     uvi: Optional[float]
     weather_code: Optional[int]
     updated_at: datetime
@@ -103,9 +113,11 @@ class WeatherHistoryOut(BaseModel):
     class Config:
         orm_mode = True
 
+
 # --------------------------
 # Create/Update Schemas (if needed)
 # --------------------------
+
 
 class WeatherCreate(BaseModel):
     location_id: int
@@ -125,8 +137,7 @@ class WeatherCreate(BaseModel):
     pressure: Optional[float]
     visibility: Optional[float]
     precipitation: Optional[float]
-    precipitation_type: Optional[Literal['rain', 'snow']]
+    precipitation_type: Optional[Literal["rain", "snow"]]
     uvi: Optional[float]
     weather_code: Optional[int]
     updated_at: datetime
-
