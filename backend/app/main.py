@@ -3,12 +3,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import weather, location, export, integrations
-from app.utils.errors import register_exception_handlers
-
+from app.api import export, integrations, location, weather
 # Import SQLAlchemy base and model
 from app.db.database import Base, engine
 from app.models.export import ExportHistory  # Needed for table registration
+from app.utils.errors import register_exception_handlers
 
 # Create tables on startup
 Base.metadata.create_all(bind=engine)
@@ -19,7 +18,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS Settings 
+# CORS Settings
 origins = [
     "http://localhost",
     "http://localhost:3000",  # React dev Server Address
@@ -38,7 +37,9 @@ app.add_middleware(
 app.include_router(weather.router, prefix="/api/weather", tags=["Weather"])
 app.include_router(location.router, prefix="/api/location", tags=["Location"])
 app.include_router(export.router, prefix="/api/export", tags=["Export"])
-app.include_router(integrations.router, prefix="/api/integrations", tags=["Integrations"])
+app.include_router(
+    integrations.router, prefix="/api/integrations", tags=["Integrations"]
+)
 
 # Register global exception handlers
 register_exception_handlers(app)

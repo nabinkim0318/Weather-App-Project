@@ -30,20 +30,26 @@ Integration Points:
 This module is foundational for data persistence and plays a critical role in ensuring efficient, safe, and consistent
 database interactions throughout the application lifecycle.
 """
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+
+import os
 from contextlib import contextmanager
 from typing import Generator
-import os
+
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session, sessionmaker
 
 # Load the database URL from environment variable or config
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")  # Replace with production URL as needed
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "sqlite:///./test.db"
+)  # Replace with production URL as needed
 
 # SQLAlchemy Engine
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
+    connect_args=(
+        {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+    ),
     pool_pre_ping=True,
     pool_size=10,
     max_overflow=20,
@@ -56,6 +62,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base class for declarative models
 Base = declarative_base()
 
+
 # Dependency injection function for FastAPI
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
@@ -63,6 +70,7 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
 
 # Optional: context manager for use outside FastAPI (e.g., scripts)
 @contextmanager

@@ -42,6 +42,7 @@ Benefits:
 This module is a cornerstone for robust backend reliability and user-friendly
 error communication.
 """
+
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
@@ -51,5 +52,5 @@ def register_exception_handlers(app):
     async def validation_error_handler(request, exc):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Validation error", "errors": exc.errors()}
+            content={"detail": "Validation error", "errors": exc.errors()},
         )

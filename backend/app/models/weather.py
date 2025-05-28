@@ -72,3 +72,53 @@ class WeatherHistory(Base):
 
     location = relationship("Location", back_populates="weather_records")
 """
+
+from sqlalchemy import (Column, DateTime, Float, ForeignKey, Index, Integer,
+                        String)
+from sqlalchemy.orm import relationship
+
+from app.db.database import Base  # Usually declared in database.py
+
+
+class WeatherHistory(Base):
+    __tablename__ = "weather_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    location_id = Column(
+        Integer, ForeignKey("locations.id"), nullable=False, index=True
+    )
+    weather_date = Column(DateTime, nullable=False, index=True)
+
+    temp_c = Column(Float, nullable=False)
+    temp_f = Column(Float, nullable=False)
+    humidity = Column(Float, nullable=True)
+
+    wind_speed = Column(Float, nullable=True)
+    wind_deg = Column(Float, nullable=True)
+    wind_gust = Column(Float, nullable=True)
+
+    condition = Column(String, nullable=False)
+    condition_desc = Column(String, nullable=True)
+    icon = Column(String, nullable=True)
+
+    sunrise = Column(DateTime, nullable=True)
+    sunset = Column(DateTime, nullable=True)
+
+    pressure = Column(Float, nullable=True)
+    visibility = Column(Float, nullable=True)
+
+    precipitation = Column(Float, nullable=True)
+    precipitation_type = Column(String, nullable=True)
+
+    uvi = Column(Float, nullable=True)
+    weather_code = Column(Integer, nullable=True)
+
+    updated_at = Column(DateTime, nullable=False)
+
+    location = relationship("Location", back_populates="weather_records")
+
+
+# Index Example (for composite indexes, etc.)
+Index(
+    "ix_weather_location_date", WeatherHistory.location_id, WeatherHistory.weather_date
+)

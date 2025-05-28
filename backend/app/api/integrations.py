@@ -28,6 +28,7 @@ Integration Points:
 
 This module extends the Weather App by embedding rich multimedia and geographic content, increasing user engagement and providing contextual information beyond raw weather data.
 """
+
 from fastapi import APIRouter, Query
 
 from app.services.weather_service import fetch_current_weather, fetch_forecast

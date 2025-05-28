@@ -38,6 +38,7 @@ Integration Points:
 
 This module facilitates robust user location management, enabling seamless integration of location-based services within the Weather App backend.
 """
+
 from fastapi import APIRouter, Query
 
 from app.services.weather_service import fetch_current_weather, fetch_forecast

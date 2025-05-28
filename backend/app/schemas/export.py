@@ -16,20 +16,29 @@ Usage:
 - Use ExportHistoryUpdate for patching status or metadata.
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel, Field
+
 
 class ExportHistoryBase(BaseModel):
-    export_type: str = Field(default=..., description="Export file type (csv, json, pdf)")
-    export_params: Optional[Dict[str, Any]] = Field(None, description="Export parameters")
+    export_type: str = Field(
+        default=..., description="Export file type (csv, json, pdf)"
+    )
+    export_params: Optional[Dict[str, Any]] = Field(
+        None, description="Export parameters"
+    )
+
 
 class ExportHistoryCreate(ExportHistoryBase):
     user_id: Optional[int] = None
 
+
 class ExportHistoryUpdate(BaseModel):
     status: Optional[str] = Field(None, description="Export status")
     error_message: Optional[str] = None
+
 
 class ExportHistoryRead(ExportHistoryBase):
     id: int

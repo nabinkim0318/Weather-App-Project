@@ -52,4 +52,3 @@ class User(Base):
     # Relationships example
     locations = relationship("Location", back_populates="user")
 """
-

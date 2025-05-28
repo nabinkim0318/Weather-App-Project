@@ -42,26 +42,39 @@ Additional Enhancements:
     - Uses ReportLab to dynamically generate summary-style PDF documents.
     - PDF content includes formatted weather data and may be extended with charts or styled layouts.
 """
-from fastapi import APIRouter, Query, HTTPException, Response, Depends
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
-from typing import Optional, List
-
-from app.db.database import get_db
-from app.services import export_service
-from app.schemas.export import ExportHistoryRead, ExportHistoryCreate, ExportHistoryUpdate
-from app.models.export import ExportHistory
-from sqlalchemy import select
 
 import io
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.responses import StreamingResponse
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.db.database import get_db
+from app.models.export import ExportHistory
+from app.schemas.export import (ExportHistoryCreate, ExportHistoryRead,
+                                ExportHistoryUpdate)
+from app.services import export_service
 
 router = APIRouter(tags=["Export"])
 
 # Mock weather data (replace with DB logic later)
 mock_data = [
-    {"date": "2025-05-27", "location": "New York", "temperature": 22, "condition": "Sunny"},
-    {"date": "2025-05-28", "location": "New York", "temperature": 24, "condition": "Cloudy"}
+    {
+        "date": "2025-05-27",
+        "location": "New York",
+        "temperature": 22,
+        "condition": "Sunny",
+    },
+    {
+        "date": "2025-05-28",
+        "location": "New York",
+        "temperature": 24,
+        "condition": "Cloudy",
+    },
 ]
+
 
 def get_data() -> list:
     if not mock_data:
@@ -69,17 +82,17 @@ def get_data() -> list:
     return mock_data
 
 
-def log_export(db: Session, export_type: str, status: str = "success", error: Optional[str] = None):
+def log_export(
+    db: Session, export_type: str, status: str = "success", error: Optional[str] = None
+):
     entry = ExportHistoryCreate(
-        export_type=export_type,
-        export_params={"source": "mock"},
-        user_id=None
+        export_type=export_type, export_params={"source": "mock"}, user_id=None
     )
     data = entry.dict()
-    data.pop("user_id", None)  
+    data.pop("user_id", None)
 
     export_record = ExportHistory(**data, status=status, error_message=error)
-    print("Logging export:", export_record)  
+    print("Logging export:", export_record)
     db.add(export_record)
     db.commit()
 
@@ -90,9 +103,11 @@ def export_csv(db: Session = Depends(get_db)):
         data = get_data()
         buffer = export_service.export_to_csv(data)
         log_export(db, export_type="csv")
-        return StreamingResponse(iter([buffer.getvalue()]), media_type="text/csv", headers={
-            "Content-Disposition": "attachment; filename=weather_data.csv"
-        })
+        return StreamingResponse(
+            iter([buffer.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=weather_data.csv"},
+        )
     except Exception as e:
         log_export(db, export_type="csv", status="failed", error=str(e))
         raise HTTPException(status_code=500, detail=f"CSV export failed: {str(e)}")
@@ -104,9 +119,11 @@ def export_json(pretty: Optional[bool] = Query(False), db: Session = Depends(get
         data = get_data()
         json_data = export_service.export_to_json(data, pretty=pretty or False)
         log_export(db, export_type="json")
-        return Response(content=json_data, media_type="application/json", headers={
-            "Content-Disposition": "attachment; filename=weather_data.json"
-        })
+        return Response(
+            content=json_data,
+            media_type="application/json",
+            headers={"Content-Disposition": "attachment; filename=weather_data.json"},
+        )
     except Exception as e:
         log_export(db, export_type="json", status="failed", error=str(e))
         raise HTTPException(status_code=500, detail=f"JSON export failed: {str(e)}")
@@ -118,19 +135,22 @@ def export_pdf(db: Session = Depends(get_db)):
         data = get_data()
         buffer = export_service.export_to_pdf(data)
         log_export(db, export_type="pdf")
-        return StreamingResponse(buffer, media_type="application/pdf", headers={
-            "Content-Disposition": "attachment; filename=weather_report.pdf"
-        })
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": "attachment; filename=weather_report.pdf"},
+        )
     except Exception as e:
         log_export(db, export_type="pdf", status="failed", error=str(e))
         raise HTTPException(status_code=500, detail=f"PDF export failed: {str(e)}")
-    
+
+
 @router.get("/history", response_model=List[ExportHistoryRead])
 def get_export_history(
     export_type: Optional[str] = None,
     status: Optional[str] = None,
     user_id: Optional[int] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """
     Retrieve export history logs with optional filtering.

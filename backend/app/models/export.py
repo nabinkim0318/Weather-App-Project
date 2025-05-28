@@ -30,21 +30,31 @@ Benefits:
 - Assists in debugging export failures or performance issues.
 - Supports compliance with data governance policies.
 """
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON
-from sqlalchemy.orm import relationship
-from app.db.database import Base  # Assumes you have a `Base` declared in `database.py`
+
 import datetime
-#from app.models.user import User
+
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from app.db.database import \
+    Base  # Assumes you have a `Base` declared in `database.py`
+
+# from app.models.user import User
+
 
 class ExportHistory(Base):
     __tablename__ = "export_history"
 
     id = Column(Integer, primary_key=True, index=True)
-    #user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    # user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     export_type = Column(String, nullable=False)  # e.g., "csv", "json", "pdf"
-    export_params = Column(JSON, nullable=True)  # JSON storing filters, date ranges, etc.
-    status = Column(String, nullable=False, default="pending")  # pending, success, failed
+    export_params = Column(
+        JSON, nullable=True
+    )  # JSON storing filters, date ranges, etc.
+    status = Column(
+        String, nullable=False, default="pending"
+    )  # pending, success, failed
     error_message = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
-    #user = relationship("User", back_populates="exports")  # Assumes a related User model
+    # user = relationship("User", back_populates="exports")  # Assumes a related User model
