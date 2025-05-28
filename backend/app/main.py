@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import export, integrations, location, weather
 from app.db.database import Base, engine
-from app.models.export import ExportHistory  
+from app.models.export import ExportHistory
 from app.utils.errors import register_exception_handlers
 
 # --- Logging Setup ---
@@ -47,7 +47,9 @@ app.add_middleware(
 app.include_router(weather.router, prefix="/api/weather", tags=["Weather"])
 app.include_router(location.router, prefix="/api/location", tags=["Location"])
 app.include_router(export.router, prefix="/api/export", tags=["Export"])
-app.include_router(integrations.router, prefix="/api/integrations", tags=["Integrations"])
+app.include_router(
+    integrations.router, prefix="/api/integrations", tags=["Integrations"]
+)
 
 
 @app.get("/")

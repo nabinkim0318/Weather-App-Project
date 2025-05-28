@@ -32,9 +32,12 @@ Benefits:
 - Enhances maintainability by decoupling database schema from business logic.
 - Facilitates secure and efficient user management and data access.
 """
+
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime
+
+from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
+
 from app.db.database import Base
 
 
