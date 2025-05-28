@@ -31,7 +31,6 @@ jobs:
           --health-retries=5
 
     env:
-      # ✅ 민감 정보는 Secrets에서 불러오기
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
