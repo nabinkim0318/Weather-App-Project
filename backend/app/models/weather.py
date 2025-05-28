@@ -2,13 +2,14 @@
 Module: models.weather
 ----------------------
 
-This module defines ORM models related to weather data within the application's database schema.
-It provides structured mapping for weather-related entities such as current weather records,
-historical weather data, and weather forecasts, enabling persistent storage, querying,
-and management of weather information.
+This module defines ORM models related to weather data within the application's
+database schema. It provides structured mapping for weather-related entities such as
+current weather records, historical weather data, and weather forecasts, enabling
+persistent storage, querying, and management of weather information.
 
 Key Responsibilities:
-- Define tables/models for storing weather observations and forecasts with relevant meteorological fields:
+- Define tables/models for storing weather observations and forecasts with relevant
+  meteorological fields:
   - Temperature (Celsius and Fahrenheit)
   - Humidity, wind speed, wind direction, wind gusts
   - Atmospheric pressure, visibility, precipitation amount and type
@@ -23,12 +24,12 @@ Key Responsibilities:
   - Current weather snapshots
   - Historical weather records (time series)
   - Forecasted weather data (daily, hourly)
-- Facilitate CRUD operations on weather data with consistency and integrity guarantees.
-- Enable integration with external weather APIs by storing raw or processed response data.
+- Facilitate CRUD operations on weather data with consistency & integrity guarantees.
+- Enable integration with weather APIs by storing raw or processed response data.
 - Support data versioning or update tracking through timestamp fields.
 
 Usage:
-- Use the WeatherHistory model for storing and retrieving historical weather observations.
+- Use the WeatherHistory model for storing & retrieving historical weather observations.
 - Use the Forecast model (if defined) to save forecast data for locations and dates.
 - Access weather data linked to locations for API response construction or UI rendering.
 - Enable weather data updates with validation and error handling in services.
@@ -49,7 +50,8 @@ class WeatherHistory(Base):
     __tablename__ = "weather_history"
 
     id = Column(Integer, primary_key=True, index=True)
-    location_id = Column(Integer, ForeignKey("locations.id"), nullable=False, index=True)
+    location_id = Column(Integer, ForeignKey("locations.id"),
+       nullable=False, index=True)
     weather_date = Column(DateTime, nullable=False, index=True)
     temp_c = Column(Float, nullable=False)
     temp_f = Column(Float, nullable=False)

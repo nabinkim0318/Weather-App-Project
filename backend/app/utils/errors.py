@@ -12,13 +12,14 @@ Key Components:
   - ValidationError: Raised when input data fails validation checks.
   - NotFoundError: Raised when requested resources such as locations or weather
     records are not found.
-  - DuplicateEntryError: Raised when attempting to create a resource that violates
-    uniqueness constraints.
+  - DuplicateEntryError: Raised when attempting to create a resource that
+    violates uniqueness constraints.
   - ExternalAPIError: Raised for failures related to external API calls.
   - DatabaseError: Raised on database connection or query execution failures.
   - AuthorizationError: Raised when authentication or authorization fails.
   - ConflictError: Raised for concurrency or data conflict issues.
-  - SerializationError: Raised during JSON/XML/CSV serialization or deserialization failures.
+  - SerializationError: Raised during JSON/XML/CSV serialization or
+    deserialization failures.
   - TimeoutError: Raised when operations exceed predefined time limits.
 
 - Global Exception Handlers:
@@ -26,10 +27,12 @@ Key Components:
   - Map exceptions to standard HTTP status codes (e.g., 400, 404, 409, 500).
   - Format error messages into consistent JSON response payloads.
   - Log errors with relevant context for troubleshooting.
-  - Handle unexpected exceptions gracefully to avoid leaking sensitive information.
+  - Handle unexpected exceptions gracefully to avoid leaking
+    sensitive information.
 
 Usage:
-- Raise defined exceptions in service and CRUD layers to indicate specific error conditions.
+- Raise defined exceptions in service and CRUD layers to indicate
+  specific error conditions.
 - Register global handlers with FastAPI's exception middleware.
 - Enable centralized control over error response formatting and logging.
 
@@ -45,7 +48,8 @@ error communication.
 
 import logging
 
-from fastapi import HTTPException, Request
+# from fastapi import HTTPException,
+from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError as PydanticValidationError
@@ -219,4 +223,5 @@ def register_exception_handlers(app):
 # app.add_exception_handler(ConflictError, conflict_exception_handler)
 # app.add_exception_handler(SerializationError, serialization_exception_handler)
 # app.add_exception_handler(TimeoutError, timeout_exception_handler)
-# app.add_exception_handler(RequestValidationError, request_validation_exception_handler)
+# app.add_exception_handler(RequestValidationError,
+# request_validation_exception_handler)

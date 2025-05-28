@@ -2,8 +2,9 @@
 Module: api.export
 ------------------
 
-This module provides FastAPI endpoints for exporting weather and related data into various file formats, enabling users to
-download or share their data conveniently. It supports common export formats including CSV, JSON, and PDF.
+This module provides FastAPI endpoints for exporting weather and related
+data into various file formats, enabling users to download or share their
+data conveniently. It supports common export formats including CSV, JSON, and PDF.
 
 Endpoints:
 - GET /api/export/csv
@@ -12,7 +13,8 @@ Endpoints:
     Exports weather data in JSON format with optional pretty-printing.
 - GET /api/export/pdf
     Generates a PDF report of weather data, including charts and summaries.
-- Additional endpoints may support filtering exported data by location, date range, or user preferences.
+- Additional endpoints may support filtering exported data by location,
+  date range, or user preferences.
 
 Key Responsibilities:
 - Validate export request parameters including data scope, format, and filters.
@@ -23,7 +25,8 @@ Key Responsibilities:
     - PDF: well-designed report including text, images, and charts.
 - Handle large data exports efficiently to avoid blocking and memory overload.
 - Stream file responses with proper HTTP headers for download.
-- Manage error handling for invalid parameters, data retrieval failures, or export generation issues.
+- Manage error handling for invalid parameters, data retrieval failures, or
+  export generation issues.
 - Optionally log export activity for auditing or usage metrics.
 
 Integration Points:
@@ -32,7 +35,8 @@ Integration Points:
 - CSV and JSON serialization utilities.
 - Authentication and authorization middleware to ensure data privacy.
 
-This module enhances user experience by providing flexible, reliable data export capabilities crucial for reporting, analysis, and sharing.
+This module enhances user experience by providing flexible, reliable data
+export capabilities crucial for reporting, analysis, and sharing.
 
 Additional Enhancements:
 - Error Handling:
@@ -40,10 +44,10 @@ Additional Enhancements:
     - Catches unexpected errors and responds with HTTP 500 and descriptive messages.
 - PDF Export:
     - Uses ReportLab to dynamically generate summary-style PDF documents.
-    - PDF content includes formatted weather data and may be extended with charts or styled layouts.
+    - PDF content includes formatted weather data and may be extended with
+      charts or styled layouts.
 """
 
-import io
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -53,10 +57,9 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.models.export import ExportHistory
-from app.schemas.export import (
+from app.schemas.export import (  # ExportHistoryUpdate,
     ExportHistoryCreate,
     ExportHistoryRead,
-    ExportHistoryUpdate,
 )
 from app.services import export_service
 

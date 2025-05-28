@@ -9,7 +9,8 @@ ensuring data consistency, reliability, and optimal performance through caching.
 
 Key Responsibilities:
 - Manage communication with third-party weather APIs to retrieve current weather,
-  forecasts, and historical weather data based on user-specified locations and date ranges.
+  forecasts, and historical weather data based on user-specified locations
+  and date ranges.
 - Implement robust error handling for API failures, including network errors,
   authentication issues, rate limiting, and unexpected response formats.
 - Parse and normalize diverse external API responses into the application's internal
@@ -18,7 +19,7 @@ Key Responsibilities:
   before further processing or persisting to the database.
 - Implement intelligent caching mechanisms to minimize redundant API calls,
   reduce latency, and stay within third-party API usage quotas.
-- Support cache invalidation and refresh policies to maintain data freshness and accuracy.
+- Support cache invalidation & refresh policies to maintain data freshness and accuracy.
 - Facilitate asynchronous or batched API calls to improve throughput and responsiveness.
 - Provide utility functions for data transformation such as unit conversions,
   timestamp normalization, and condition code mapping.
@@ -29,7 +30,8 @@ Key Responsibilities:
 Error Handling:
 - Detect and handle API response errors, timeouts, and malformed data gracefully.
 - Retry transient failures with exponential backoff where applicable.
-- Raise meaningful exceptions or error codes to inform calling layers of failure reasons.
+- Raise meaningful exceptions or error codes to inform calling layers of
+  failure reasons.
 
 Integration Points:
 - External weather data providers (e.g., OpenWeatherMap, WeatherAPI).
@@ -60,7 +62,7 @@ def c_to_f(c: Optional[float]) -> Optional[float]:
     return c * 9 / 5 + 32
 
 
-# Pydantic 모델로 응답 검증 및 변환 예시
+# Pydantic model for response validation and transformation example
 class CurrentWeatherResponse(BaseModel):
     city: Optional[str]
     country: Optional[str]
@@ -112,7 +114,7 @@ class ForecastResponse(BaseModel):
     forecast: list[ForecastItem]
 
 
-# 간단 메모리 캐시
+# Simple Memory Cache
 _cache: Dict[str, Dict[str, Any]] = {}
 
 
@@ -153,7 +155,7 @@ async def fetch_current_weather(
     if not data:
         return None
 
-    # 데이터 파싱
+    # Parse data
     main = data.get("main", {})
     wind = data.get("wind", {})
     sys = data.get("sys", {})
@@ -240,9 +242,8 @@ async def fetch_forecast(
     return result
 
 
-# 동기 코드가 필요하면 asyncio.run()으로 호출 가능
+# If you need synchronous code, you can call it with asyncio.run()
 if __name__ == "__main__":
-    import asyncio
 
     async def main():
         current = await fetch_current_weather(city="Seoul")

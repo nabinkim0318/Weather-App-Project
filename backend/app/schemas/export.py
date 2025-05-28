@@ -2,8 +2,9 @@
 Module: schemas.export
 ----------------------
 
-This module defines Pydantic schemas for validating and serializing data related to export history records.
-These schemas are used for API input/output and ensure consistent, structured communication between client and server.
+This module defines Pydantic schemas for validating and serializing data related to
+export history records. These schemas are used for API input/output and
+ensure consistent, structured communication between client and server.
 
 Key Responsibilities:
 - Define base and full schemas for ExportHistory model.

@@ -8,7 +8,8 @@ location-related data to a relational database table, enabling efficient and str
 storage, retrieval, and management of location information used by the application.
 
 Key Responsibilities:
-- Define the database schema for the Location table, including columns for key attributes:
+- Define the database schema for the Location table, including columns for
+  key attributes:
   - Unique location identifier (primary key)
   - Human-readable location name (e.g., city, town, landmark)
   - Geographical coordinates (latitude and longitude)

@@ -2,15 +2,19 @@
 Module: api.weather
 -------------------
 
-This module defines the FastAPI router responsible for handling all weather-related endpoints, including current weather data retrieval,
-weather forecast management, and integration with external weather APIs. It implements CRUD operations to create, read, update, and delete
-weather data records in the database, while also supporting fetching real-time weather information via third-party APIs.
+This module defines the FastAPI router responsible for handling all weather-
+related endpoints, including current weather data retrieval, weather forecast
+management, and integration with external weather APIs. It implements CRUD
+operations to create, read, update, and delete weather data records in the
+database, while also supporting fetching real-time weather information via
+third-party APIs.
 
 Endpoints:
 - GET /api/weather/current
     Retrieves current weather information for a specified location.
 - POST /api/weather
-    Creates new weather data entries based on a location and optional date range. Fetches data from external APIs and stores it persistently.
+    Creates new weather data entries based on a location and optional date
+    range. Fetches data from external APIs and stores it persistently.
 - GET /api/weather/{weather_id}
     Retrieves stored weather data by unique weather record identifier.
 - PUT /api/weather/{weather_id}
@@ -25,7 +29,8 @@ Key Responsibilities:
 - Validate user input for location formats, date ranges, and query parameters.
 - Interact with external weather APIs to fetch real-time and forecast weather data.
 - Persist weather data in a relational or NoSQL database with proper schema validation.
-- Handle errors including validation failures, external API timeouts, data inconsistencies, and database transaction errors.
+- Handle errors including validation failures, external API timeouts, data
+  inconsistencies, and database transaction errors.
 - Implement caching strategies for API responses to optimize performance.
 - Return well-structured JSON responses conforming to Pydantic schemas.
 - Support pagination and filtering for forecast data endpoints.
@@ -35,24 +40,27 @@ Integration Points:
 - Database layer for CRUD operations on weather data.
 - Authentication and authorization middleware (if applicable).
 
-This module is a core part of the backend service enabling users and clients to query, store, and manage weather-related information effectively.
+This module is a core part of the backend service enabling users and clients to
+query, store, and manage weather-related information effectively.
 """
 
 from datetime import date
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, HTTPException, Path, Query, status
-from pydantic import BaseModel, Field, field_validator
+from fastapi import APIRouter, HTTPException, Query
 
-from app.services.weather_service import (
-    delete_weather_data,
-    fetch_current_weather,
-    fetch_forecast,
-    get_forecast_data,
-    get_weather_by_id,
-    save_weather_data,
-    update_weather_data,
-)
+# from fastapi import  Body, Path, status
+from pydantic import BaseModel, field_validator  # Field
+
+from app.services.weather_service import fetch_current_weather  # fetch_forecast,
+
+# from app.services.weather_service import (
+#     delete_weather_data,
+#     get_forecast_data,
+#     get_weather_by_id,
+#     save_weather_data,
+#     update_weather_data,
+# )
 
 router = APIRouter()
 
@@ -115,54 +123,55 @@ def get_current_weather(
     return result
 
 
-@router.post(
-    "/weather", response_model=WeatherResponse, status_code=status.HTTP_201_CREATED
-)
-def create_weather(data: WeatherCreateRequest = Body(...)):
-    # Fetch weather data from external API and save to DB
-    saved = save_weather_data(data)
-    if not saved:
-        raise HTTPException(status_code=500, detail="Failed to save weather data.")
-    return saved
+# @router.post(
+#     "/weather", response_model=WeatherResponse, status_code=status.HTTP_201_CREATED
+# )
+# def create_weather(data: WeatherCreateRequest = Body(...)):
+#     # Fetch weather data from external API and save to DB
+#     saved = save_weather_data(data)
+#     if not saved:
+#         raise HTTPException(status_code=500, detail="Failed to save weather data.")
+#     return saved
 
 
-@router.get("/weather/{weather_id}", response_model=WeatherResponse)
-def read_weather(weather_id: int = Path(..., gt=0)):
-    data = get_weather_by_id(weather_id)
-    if not data:
-        raise HTTPException(status_code=404, detail="Weather record not found.")
-    return data
+# @router.get("/weather/{weather_id}", response_model=WeatherResponse)
+# def read_weather(weather_id: int = Path(..., gt=0)):
+#     data = get_weather_by_id(weather_id)
+#     if not data:
+#         raise HTTPException(status_code=404, detail="Weather record not found.")
+#     return data
 
 
-@router.put("/weather/{weather_id}", response_model=WeatherResponse)
-def update_weather(weather_id: int, data: WeatherCreateRequest):
-    updated = update_weather_data(weather_id, data)
-    if not updated:
-        raise HTTPException(
-            status_code=404, detail="Weather record not found or update failed."
-        )
-    return updated
+# @router.put("/weather/{weather_id}", response_model=WeatherResponse)
+# def update_weather(weather_id: int, data: WeatherCreateRequest):
+#     updated = update_weather_data(weather_id, data)
+#     if not updated:
+#         raise HTTPException(
+#             status_code=404, detail="Weather record not found or update failed."
+#         )
+#     return updated
 
 
-@router.delete("/weather/{weather_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_weather(weather_id: int):
-    success = delete_weather_data(weather_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Weather record not found.")
-    return None
+# @router.delete("/weather/{weather_id}", status_code=status.HTTP_204_NO_CONTENT)
+# def delete_weather(weather_id: int):
+#     success = delete_weather_data(weather_id)
+#     if not success:
+#         raise HTTPException(status_code=404, detail="Weather record not found.")
+#     return None
 
 
-@router.get("/forecast", response_model=ForecastResponse)
-def get_forecast(
-    city: Optional[str] = Query(None),
-    lat: Optional[float] = Query(None),
-    lon: Optional[float] = Query(None),
-    start_date: Optional[date] = Query(None),
-    end_date: Optional[date] = Query(None),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
-):
-    forecast = get_forecast_data(city, lat, lon, start_date, end_date, page, page_size)
-    if not forecast:
-        raise HTTPException(status_code=404, detail="Forecast not found.")
-    return forecast
+# @router.get("/forecast", response_model=ForecastResponse)
+# def get_forecast(
+#     city: Optional[str] = Query(None),
+#     lat: Optional[float] = Query(None),
+#     lon: Optional[float] = Query(None),
+#     start_date: Optional[date] = Query(None),
+#     end_date: Optional[date] = Query(None),
+#     page: int = Query(1, ge=1),
+#     page_size: int = Query(10, ge=1, le=100),
+# ):
+#     forecast = get_forecast_data(city, lat, lon, start_date,
+#                               end_date, page, page_size)
+#     if not forecast:
+#         raise HTTPException(status_code=404, detail="Forecast not found.")
+#     return forecast

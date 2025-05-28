@@ -10,12 +10,14 @@ business logic related to data manipulation.
 Key Responsibilities:
 - Define reusable and composable functions for creating, retrieving, updating,
   and deleting records for each table/model (e.g., User, Location, WeatherHistory).
-- Implement input validation and enforce database constraints to maintain data integrity.
+- Implement input validation and enforce database constraints
+  to maintain data integrity.
 - Handle and propagate database-related exceptions such as unique constraint violations,
   foreign key errors, and connection failures with appropriate error handling.
-- Support filtering, pagination, and sorting options for read operations to efficiently
-  query large datasets.
-- Ensure atomicity and consistency using transactions for multi-step operations when needed.
+- Support filtering, pagination, and sorting options for read operations to
+  efficiently query large datasets.
+- Ensure atomicity and consistency using transactions for multi-step operations
+  when needed.
 - Provide clear return types and error signaling for use in service and API layers.
 - Facilitate unit testing by isolating database interaction logic from business logic.
 - Log significant CRUD actions and errors for audit and debugging purposes.

@@ -8,27 +8,29 @@ conversion, and transformation, improving code reusability and maintainability.
 
 Key Functionalities:
 - Data Formatting:
-  Functions to format dates, timestamps, temperature units, and other domain-specific data
-  into consistent, human-readable strings or API-compatible formats.
+  Functions to format dates, timestamps, temperature units, and other
+  domain-specific data into consistent, human-readable strings or
+  API-compatible formats.
 
 - API Response Processing:
   Helpers to standardize and sanitize external API responses, extract relevant fields,
   and convert data structures as needed for internal use.
 
 - Conversion Utilities:
-  Functions to convert between units (e.g., Celsius to Fahrenheit), data types, or encoding
-  schemes that simplify business logic and prevent duplication.
+  Functions to convert between units (e.g., Celsius to Fahrenheit), data types,
+  or encoding schemes that simplify business logic and prevent duplication.
 
 - Serialization Helpers:
-  Assist with preparing data for JSON serialization, including handling datetime objects,
-  nested models, and optional fields gracefully.
+  Assist with preparing data for JSON serialization, including handling datetime
+  objects, nested models, and optional fields gracefully.
 
 - Miscellaneous Utilities:
   Small helper functions for string manipulations, safe dictionary access, generating
   unique identifiers, and other common coding patterns.
 
 Design Principles:
-- Keep each helper function focused and single-purpose to promote clarity and testability.
+- Keep each helper function focused and single-purpose to promote
+  clarity and testability.
 - Avoid side effects; helpers should be pure functions where possible.
 - Provide clear, descriptive function names and docstrings for ease of use.
 - Optimize for performance when handling frequently used operations.

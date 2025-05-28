@@ -5,7 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import export, integrations, location, weather
 from app.db.database import Base, engine
-from app.models.export import ExportHistory
+
+# from app.models.export import ExportHistory
 from app.utils.errors import register_exception_handlers
 
 # --- Logging Setup ---
@@ -22,7 +23,10 @@ Base.metadata.create_all(bind=engine)
 # --- Create FastAPI App ---
 app = FastAPI(
     title="Weather App API",
-    description="API for Weather App with CRUD, external API integration, and export features",
+    description=(
+        "API for Weather App with CRUD, external API integration, "
+        "and export features"
+    ),
     version="1.0.0",
 )
 

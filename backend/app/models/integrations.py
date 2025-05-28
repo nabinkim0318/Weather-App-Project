@@ -2,26 +2,33 @@
 Module: models.integrations
 ---------------------------
 
-This module defines ORM models related to third-party API integrations used within the application,
-specifically for services like Google Maps, YouTube, and any API key management required for these integrations.
+This module defines ORM models related to third-party API integrations used within
+the application, specifically for services like Google Maps, YouTube, and any API
+key management required for these integrations.
 
 Key Responsibilities:
-- Define models to store API keys securely, including metadata about their usage and status.
-- Represent integration-specific configurations or data linked to external services (e.g., YouTube channel info, map preferences).
-- Track usage limits, expiration, and renewal information for API keys to manage quota and avoid service interruptions.
+- Define models to store API keys securely, including metadata about their
+  usage and status.
+- Represent integration-specific configurations or data linked to external services
+  (e.g., YouTube channel info, map preferences).
+- Track usage limits, expiration, and renewal information for API keys to manage
+  quota and avoid service interruptions.
 - Facilitate storing user or system preferences related to third-party integrations.
-- Enable audit and debugging by maintaining logs or metadata of integration requests if applicable.
+- Enable audit and debugging by maintaining logs or metadata of integration requests
+  if applicable.
 
 Primary Models:
 - APIKey: Stores credentials and metadata for third-party API access.
 - YouTubeIntegration: Represents configuration or data related to YouTube API usage.
-- MapIntegration: Represents configuration or data related to map services (e.g., Google Maps API).
+- MapIntegration: Represents configuration or data related to map services
+  (e.g., Google Maps API).
 
 Usage:
 - Use APIKey model to authenticate and authorize external API calls.
 - Manage API keys lifecycle: creation, activation, deactivation, expiration.
 - Store integration-specific user preferences or settings.
-- Support backend logic to select appropriate keys and integration parameters dynamically.
+- Support backend logic to select appropriate keys and integration parameters
+  dynamically.
 - Facilitate admin monitoring of third-party integration health and usage.
 
 Benefits:
@@ -41,7 +48,7 @@ class APIKey(Base):
     __tablename__ = "api_keys"
 
     id = Column(Integer, primary_key=True, index=True)
-    service_name = Column(String, nullable=False)  # e.g., "Google Maps", "YouTube"
+    service_name = Column(String, nullable=False)  # e.g., "YouTube"
     key_value = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
