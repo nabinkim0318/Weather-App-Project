@@ -31,12 +31,12 @@ Benefits:
 - Simplifies database operations via ORM abstractions.
 - Enhances maintainability by decoupling database schema from business logic.
 - Facilitates secure and efficient user management and data access.
-
-Example:
-```python
+"""
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-from .database import Base
+from app.db.database import Base
+
 
 class User(Base):
     __tablename__ = "users"
@@ -49,6 +49,5 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationships example
+    # Example: User and Location have a 1:N relationship
     locations = relationship("Location", back_populates="user")
-"""
