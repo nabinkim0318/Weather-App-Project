@@ -23,3 +23,5 @@ run:
 
 migrate:
 	poetry run alembic upgrade head
+
+pipeline: format lint check test

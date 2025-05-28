@@ -27,6 +27,7 @@ profile = "black"
 [tool.poetry.group.dev.dependencies]
 httpx = "^0.24.1"
 uvicorn = {extras = ["standard"], version = "^0.34.2"}
+pre-commit = "^4.2.0"
 
 [build-system]
 requires = ["poetry-core"]
