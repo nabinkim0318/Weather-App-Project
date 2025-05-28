@@ -49,9 +49,53 @@ This module facilitates robust user location management, enabling seamless
 integration of location-based services within the Weather App backend.
 """
 
+import os
+
+import requests
 from fastapi import APIRouter
 
 # from fastapi import Query
 # from app.services.weather_service import fetch_current_weather, fetch_forecast
 
 router = APIRouter()
+
+
+def geocode_location(location: str) -> tuple:
+    """
+    Converts a city name, address, or zip code to latitude and longitude using
+    the OpenWeather Geocoding API.
+
+    Args:
+        location (str): City name, address, or zip code (e.g., "Seoul", "1600
+        Amphitheatre Parkway, Mountain View, CA").
+
+    Returns:
+        tuple: (latitude, longitude)
+
+    Raises:
+        ValueError: If the location is not found by the API.
+    """
+    api_key = os.environ.get("OPENWEATHER_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENWEATHER_API_KEY not set in environment variables.")
+
+    url = (
+        f"http://api.openweathermap.org/geo/1.0/direct?q={location}"
+        f"&limit=1&appid={api_key}"
+    )
+    response = requests.get(url)
+    data = response.json()
+
+    if not data:
+        raise ValueError(f"Location not found: {location}")
+
+    lat = data[0]["lat"]
+    lon = data[0]["lon"]
+    return lat, lon
+
+
+# Example usage
+if __name__ == "__main__":
+    city = "Seoul"
+    lat, lon = geocode_location(city)
+    print(f"{city} coordinates: lat={lat}, lon={lon}")

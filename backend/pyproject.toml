@@ -12,6 +12,7 @@ reportlab = "^4.4.1"
 sqlalchemy = "^2.0.41"
 asyncpg = "^0.30.0"
 requests = "^2.32.3"
+pytest = "^8.3.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.0"
