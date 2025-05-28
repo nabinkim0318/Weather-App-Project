@@ -8,6 +8,10 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = "^0.110.0"
+reportlab = "^4.4.1"
+sqlalchemy = "^2.0.41"
+asyncpg = "^0.30.0"
+requests = "^2.32.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.0"
@@ -18,6 +22,7 @@ coverage = "^7.5.0"
 
 [tool.poetry.group.dev.dependencies]
 httpx = "^0.24.1"
+uvicorn = {extras = ["standard"], version = "^0.34.2"}
 
 [build-system]
 requires = ["poetry-core"]

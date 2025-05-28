@@ -1,3 +1,46 @@
+"""
+Module: services.weather_service
+---------------------------------
+
+This module encapsulates the business logic related to fetching, caching, formatting,
+and validating weather data from external weather APIs. It acts as an intermediary
+between the raw external data sources and the application's internal data models,
+ensuring data consistency, reliability, and optimal performance through caching.
+
+Key Responsibilities:
+- Manage communication with third-party weather APIs to retrieve current weather,
+  forecasts, and historical weather data based on user-specified locations and date ranges.
+- Implement robust error handling for API failures, including network errors,
+  authentication issues, rate limiting, and unexpected response formats.
+- Parse and normalize diverse external API responses into the application's internal
+  data schemas for downstream processing and storage.
+- Validate incoming weather data for completeness, correctness, and logical consistency
+  before further processing or persisting to the database.
+- Implement intelligent caching mechanisms to minimize redundant API calls,
+  reduce latency, and stay within third-party API usage quotas.
+- Support cache invalidation and refresh policies to maintain data freshness and accuracy.
+- Facilitate asynchronous or batched API calls to improve throughput and responsiveness.
+- Provide utility functions for data transformation such as unit conversions,
+  timestamp normalization, and condition code mapping.
+- Log API call metrics, errors, and cache statistics for monitoring and diagnostics.
+- Expose a clean and reusable interface for service layer or API handlers to access
+  weather data without direct knowledge of external API details.
+
+Error Handling:
+- Detect and handle API response errors, timeouts, and malformed data gracefully.
+- Retry transient failures with exponential backoff where applicable.
+- Raise meaningful exceptions or error codes to inform calling layers of failure reasons.
+
+Integration Points:
+- External weather data providers (e.g., OpenWeatherMap, WeatherAPI).
+- Application caching layers (in-memory, Redis, etc.).
+- Data validation and transformation utilities.
+- Database persistence layer via service or repository calls.
+
+This module is essential for maintaining high availability, accuracy, and
+performance of weather-related features within the application.
+"""
+
 import os
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
