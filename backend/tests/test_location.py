@@ -15,7 +15,7 @@ mock_weather_response = {
 
 
 def test_detect_input_type():
-    from app.api.location import detect_input_type
+    from backend.app.api.search_location import detect_input_type
 
     assert detect_input_type("37.5665,126.978") == "latlon"
     assert detect_input_type("12345") == "zip"
@@ -23,14 +23,14 @@ def test_detect_input_type():
 
 
 def test_parse_coordinates():
-    from app.api.location import parse_coordinates
+    from backend.app.api.search_location import parse_coordinates
 
     assert parse_coordinates("37.5665,126.978") == (37.5665, 126.978)
 
 
 @patch("requests.get")
 def test_geocode_location_success(mock_get):
-    from app.api.location import geocode_location
+    from backend.app.api.search_location import geocode_location
 
     mock_response = Mock()
     mock_response.json.return_value = mock_geo_response
@@ -43,7 +43,7 @@ def test_geocode_location_success(mock_get):
 
 @patch("requests.get", side_effect=RequestException("API error"))
 def test_geocode_location_failure(mock_get):
-    from app.api.location import geocode_location
+    from backend.app.api.search_location import geocode_location
 
     with pytest.raises(RuntimeError, match="Geocoding API request failed"):
         geocode_location("Nowhere", "dummy_key")
@@ -51,7 +51,7 @@ def test_geocode_location_failure(mock_get):
 
 @patch("requests.get")
 def test_get_weather_by_coordinates(mock_get):
-    from app.api.location import get_weather_by_coordinates
+    from backend.app.api.search_location import get_weather_by_coordinates
 
     mock_response = Mock()
     mock_response.json.return_value = mock_weather_response
@@ -64,7 +64,7 @@ def test_get_weather_by_coordinates(mock_get):
 
 @patch("requests.get", side_effect=RequestException("Network error"))
 def test_get_weather_by_zip_failure(mock_get):
-    from app.api.location import get_weather_by_zip
+    from backend.app.api.search_location import get_weather_by_zip
 
     with pytest.raises(RuntimeError, match="Weather API request failed"):
         get_weather_by_zip("12345", "dummy_key")
