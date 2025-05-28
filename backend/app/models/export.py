@@ -36,8 +36,7 @@ import datetime
 from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.db.database import \
-    Base  # Assumes you have a `Base` declared in `database.py`
+from app.db.database import Base  # Assumes you have a `Base` declared in `database.py`
 
 # from app.models.user import User
 

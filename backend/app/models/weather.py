@@ -73,8 +73,7 @@ class WeatherHistory(Base):
     location = relationship("Location", back_populates="weather_records")
 """
 
-from sqlalchemy import (Column, DateTime, Float, ForeignKey, Index, Integer,
-                        String)
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.db.database import Base  # Usually declared in database.py

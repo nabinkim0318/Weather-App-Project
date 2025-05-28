@@ -44,11 +44,15 @@ from typing import List, Optional
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from pydantic import BaseModel, Field, field_validator
 
-from app.services.weather_service import (delete_weather_data,
-                                          fetch_current_weather,
-                                          fetch_forecast, get_forecast_data,
-                                          get_weather_by_id, save_weather_data,
-                                          update_weather_data)
+from app.services.weather_service import (
+    delete_weather_data,
+    fetch_current_weather,
+    fetch_forecast,
+    get_forecast_data,
+    get_weather_by_id,
+    save_weather_data,
+    update_weather_data,
+)
 
 router = APIRouter()
 
