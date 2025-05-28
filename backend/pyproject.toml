@@ -13,6 +13,8 @@ sqlalchemy = "^2.0.41"
 asyncpg = "^0.30.0"
 requests = "^2.32.3"
 pytest = "^8.3.5"
+alembic = "^1.16.1"
+psycopg2-binary = "^2.9.10"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.0"

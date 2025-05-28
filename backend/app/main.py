@@ -1,5 +1,7 @@
 import logging
+import os
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,6 +11,10 @@ from app.db.database import Base, engine
 # from app.models.export import ExportHistory
 from app.utils.errors import register_exception_handlers
 from backend.app.api import search_location
+
+load_dotenv(
+    dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+)
 
 # --- Logging Setup ---
 logging.basicConfig(
