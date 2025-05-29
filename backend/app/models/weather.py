@@ -75,8 +75,9 @@ class WeatherHistory(Base):
     location = relationship("Location", back_populates="weather_records")
 """
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String
+from sqlalchemy import JSON, Column, DateTime, Float, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from app.db.database import Base  # Usually declared in database.py
 
@@ -114,9 +115,16 @@ class WeatherHistory(Base):
     uvi = Column(Float, nullable=True)
     weather_code = Column(Integer, nullable=True)
 
-    updated_at = Column(DateTime, nullable=False)
+    updated_at = Column(
+        DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
     location = relationship("Location", back_populates="weather_records")
+
+    api_source = Column(String, nullable=True)
+    raw_response = Column(JSON, nullable=True)
+    tip = Column(String, nullable=True)
 
 
 # Index Example (for composite indexes, etc.)

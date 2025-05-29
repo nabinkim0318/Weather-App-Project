@@ -53,4 +53,4 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Example: User and Location have a 1:N relationship
-    locations = relationship("Location", back_populates="user")
+    locations = relationship("UserLocation", back_populates="user")

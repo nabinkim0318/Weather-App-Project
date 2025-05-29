@@ -68,3 +68,61 @@ def test_get_weather_by_zip_failure(mock_get):
 
     with pytest.raises(RuntimeError, match="Weather API request failed"):
         get_weather_by_zip("12345", "dummy_key")
+
+
+# import pytest
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker
+# from app.models.user_location import UserLocation
+# from app.services import user_location as svc
+# from app.db.database import Base
+
+# # Set up in-memory test DB
+# SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+# engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# @pytest.fixture(scope="module")
+# def test_db():
+#     Base.metadata.create_all(bind=engine)
+#     db = TestingSessionLocal()
+#     yield db
+#     db.close()
+
+# def test_save_user_location(test_db):
+#     user_id = 1
+#     location = UserLocation(
+#         label="Home",
+#         city="Seoul",
+#         state="Seoul",
+#         country="KR",
+#         postal_code="12345",
+#         latitude=37.5665,
+#         longitude=126.9780,
+#         user_id=user_id
+#     )
+#     test_db.add(location)
+#     test_db.commit()
+#     test_db.refresh(location)
+
+#     # Convert to dict for comparison
+#     location_dict = {
+#         'label': location.label,
+#         'city': location.city,
+#         'latitude': float(location.latitude),
+#         'longitude': float(location.longitude),
+#     }
+
+#     expected = {
+#         'label': 'Home',
+#         'city': 'Seoul',
+#         'latitude': 37.5665,
+#         'longitude': 126.9780,
+#     }
+
+#     assert location_dict == expected
+
+# def test_get_locations_by_user(test_db):
+#     locations = svc.get_locations_by_user(test_db, user_id=1)
+#     assert len(locations) == 1
+#     assert locations[0].city == "Seoul"

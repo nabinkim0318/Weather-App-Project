@@ -5,12 +5,16 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import export, integrations, weather
+# from app import models
+from app.api import export, integrations, search_location, weather
 from app.db.database import Base, engine
 
 # from app.models.export import ExportHistory
 from app.utils.errors import register_exception_handlers
-from backend.app.api import search_location
+
+# from app.models import user, user_location
+# from app.services import user_location as svc
+
 
 load_dotenv(
     dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")

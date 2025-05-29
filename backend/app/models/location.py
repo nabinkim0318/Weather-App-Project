@@ -57,4 +57,36 @@ class Location(Base):
     # Relationships
     users = relationship("User", back_populates="locations")
     weather_records = relationship("WeatherHistory", back_populates="location")
+
+name 유니크 대신 Index(name, country, state)로 변경 고려 (유연성 ↑)
+python
+Copy
+Edit
+from sqlalchemy import Index
+
+Index("ix_location_name_country_state", "name", "country", "state", unique=True)
+
+. updated_at, created_at 필드 추가 추천
+python
+Copy
+Edit
+from sqlalchemy.sql import func
+from sqlalchemy import DateTime
+
+created_at = Column(DateTime, server_default=func.now())
+updated_at = Column(DateTime, onupdate=func.now())
+
+. 향후 확장용 필드 고려
+예를 들어, 외부 API로부터 받은 장소 ID (e.g., OpenWeather, Google Places)
+
+python
+Copy
+Edit
+external_id = Column(String, nullable=True)  # optional canonical location reference
+4. repr 메서드 추가 (디버깅 및 로깅 편의)
+python
+Copy
+Edit
+def __repr__(self):
+    return f"<Location(name={self.name}, lat={self.latitude}, lon={self.longitude})>"
 """
