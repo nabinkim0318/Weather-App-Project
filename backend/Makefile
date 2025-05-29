@@ -24,4 +24,7 @@ run:
 migrate:
 	poetry run alembic upgrade head
 
+server:
+	poetry run uvicorn app.main:app --reload
+
 pipeline: format lint check test

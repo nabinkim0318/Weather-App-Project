@@ -87,7 +87,7 @@ class WeatherHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     location_id = Column(
-        Integer, ForeignKey("locations.id"), nullable=False, index=True
+        Integer, ForeignKey("search_locations.id"), nullable=False, index=True
     )
     weather_date = Column(DateTime, nullable=False, index=True)
 
@@ -120,14 +120,33 @@ class WeatherHistory(Base):
     )
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    location = relationship("Location", back_populates="weather_records")
-
     api_source = Column(String, nullable=True)
     raw_response = Column(JSON, nullable=True)
     tip = Column(String, nullable=True)
 
+    location = relationship("SearchLocation", back_populates="weather_records")
 
-# Index Example (for composite indexes, etc.)
+
+class WeatherForecast(Base):
+    __tablename__ = "weather_forecast"
+
+    id = Column(Integer, primary_key=True, index=True)
+    location_id = Column(
+        Integer, ForeignKey("search_locations.id"), nullable=False, index=True
+    )
+    weather_date = Column(DateTime, nullable=False, index=True)
+
+    temp_min_c = Column(Float, nullable=True)
+    temp_max_c = Column(Float, nullable=True)
+    condition = Column(String, nullable=True)
+    icon = Column(String, nullable=True)
+
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+    location = relationship("SearchLocation", back_populates="forecast_records")
+
+
+# Composite index for query performance
 Index(
     "ix_weather_location_date", WeatherHistory.location_id, WeatherHistory.weather_date
 )

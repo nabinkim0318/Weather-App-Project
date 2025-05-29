@@ -45,15 +45,45 @@ performance of weather-related features within the application.
 
 import asyncio
 import os
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 import httpx
-from pydantic import BaseModel, field_validator
+from fastapi import HTTPException
+from rapidfuzz import process
+
+from app.schemas.weather import (
+    ForecastItem,
+    ForecastResponse,
+    WeatherBase,
+    WeatherCurrent,
+)
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 BASE_WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
 BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
+
+KNOWN_CITIES = ["Seoul", "Busan", "New York", "Tokyo"]
+
+
+def normalize_city_name(query: str) -> str:
+    match, score, _ = process.extractOne(query, KNOWN_CITIES)
+    return match if score > 80 else query
+
+
+def get_weather_tip(condition: str) -> str:
+    tip_map = {
+        "Rain": "Bring an umbrella ☔️",
+        "Snow": "Wear warm clothes ❄️",
+        "Clear": "Perfect day for a walk 🌞",
+        "Clouds": "Might be gloomy, stay productive ☁️",
+        "Thunderstorm": "Stay indoors and safe ⛈️",
+    }
+    return tip_map.get(condition, "Stay prepared and check the forecast!")
+
+
+def icon_url(icon_code: str) -> str:
+    return f"/static/icons/{icon_code}.svg"
 
 
 def c_to_f(c: Optional[float]) -> Optional[float]:
@@ -62,59 +92,6 @@ def c_to_f(c: Optional[float]) -> Optional[float]:
     return c * 9 / 5 + 32
 
 
-# Pydantic model for response validation and transformation example
-class CurrentWeatherResponse(BaseModel):
-    city: Optional[str]
-    country: Optional[str]
-    latitude: Optional[float]
-    longitude: Optional[float]
-
-    temp_c: Optional[float]
-    temp_f: Optional[float]
-    humidity: Optional[int]
-    wind_speed: Optional[float]
-    condition: Optional[str]
-    icon: Optional[str]
-    sunrise: Optional[datetime]
-    sunset: Optional[datetime]
-    pressure: Optional[int]
-    visibility: Optional[int]
-    precipitation: Optional[float]
-    updated_at: Optional[datetime]
-
-    @field_validator("sunrise", "sunset", "updated_at", mode="before")
-    def parse_datetime(cls, v):
-        if isinstance(v, int):
-            return datetime.fromtimestamp(v, tz=timezone.utc)
-        return v
-
-
-class ForecastItem(BaseModel):
-    forecast_date: date
-    forecast_hour: Optional[int]
-    temp_c: Optional[float]
-    temp_f: Optional[float]
-    condition: Optional[str]
-    icon: Optional[str]
-    precipitation: Optional[float]
-    updated_at: Optional[datetime]
-
-    @field_validator("updated_at", mode="before")
-    def parse_datetime(cls, v):
-        if isinstance(v, int):
-            return datetime.fromtimestamp(v, tz=timezone.utc)
-        return v
-
-
-class ForecastResponse(BaseModel):
-    city: Optional[str]
-    country: Optional[str]
-    latitude: Optional[float]
-    longitude: Optional[float]
-    forecast: list[ForecastItem]
-
-
-# Simple Memory Cache
 _cache: Dict[str, Dict[str, Any]] = {}
 
 
@@ -124,9 +101,12 @@ async def fetch_url(url: str, params: dict) -> Optional[dict]:
             response = await client.get(url, params=params)
             response.raise_for_status()
             return response.json()
-        except httpx.HTTPError as e:
-            print(f"HTTP error: {e}")
-            return None
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(
+                status_code=e.response.status_code, detail="API call failed"
+            )
+        except httpx.RequestError:
+            raise HTTPException(status_code=502, detail="External API request failed")
 
 
 def _build_cache_key(prefix: str, **kwargs) -> str:
@@ -135,13 +115,13 @@ def _build_cache_key(prefix: str, **kwargs) -> str:
 
 async def fetch_current_weather(
     city: Optional[str] = None, lat: Optional[float] = None, lon: Optional[float] = None
-) -> Optional[CurrentWeatherResponse]:
+) -> Optional[WeatherCurrent]:
     if not (city or (lat is not None and lon is not None)):
         raise ValueError("You must provide either city or (lat, lon)")
 
     params = {"appid": OPENWEATHER_API_KEY, "units": "metric"}
     if city:
-        params["q"] = city
+        params["q"] = normalize_city_name(city)
     else:
         params["lat"] = lat
         params["lon"] = lon
@@ -155,33 +135,42 @@ async def fetch_current_weather(
     if not data:
         return None
 
-    # Parse data
     main = data.get("main", {})
     wind = data.get("wind", {})
     sys = data.get("sys", {})
     weather = (data.get("weather") or [{}])[0]
-    coord = data.get("coord", {})
 
     sunrise = sys.get("sunrise")
     sunset = sys.get("sunset")
 
-    result = CurrentWeatherResponse(
-        city=data.get("name"),
-        country=sys.get("country"),
-        latitude=coord.get("lat"),
-        longitude=coord.get("lon"),
-        temp_c=main.get("temp"),
-        temp_f=c_to_f(main.get("temp")),
-        humidity=main.get("humidity"),
-        wind_speed=wind.get("speed"),
-        condition=weather.get("main"),
-        icon=weather.get("icon"),
-        sunrise=sunrise,
-        sunset=sunset,
+    result = WeatherCurrent(
+        temp_c=main.get("temp", 0.0),
+        temp_f=c_to_f(main.get("temp")) or 0.0,
+        humidity=main.get("humidity", 0.0),
+        wind_speed=wind.get("speed", 0.0),
+        wind_deg=wind.get("deg"),
+        wind_gust=wind.get("gust"),
+        condition=weather.get("main", "Unknown"),
+        condition_desc=weather.get("description", ""),
+        icon=weather.get("icon", ""),
+        icon_url=icon_url(weather.get("icon", "")),
+        sunrise=(
+            datetime.fromtimestamp(sunrise, tz=timezone.utc)
+            if sunrise is not None
+            else None
+        ),
+        sunset=(
+            datetime.fromtimestamp(sunset, tz=timezone.utc)
+            if sunset is not None
+            else None
+        ),
         pressure=main.get("pressure"),
         visibility=data.get("visibility"),
         precipitation=None,
-        updated_at=data.get("dt"),
+        precipitation_type=None,
+        uvi=None,
+        weather_code=weather.get("id"),
+        updated_at=datetime.fromtimestamp(data.get("dt", 0), tz=timezone.utc),
     )
     _cache[cache_key] = {"timestamp": datetime.utcnow(), "data": result}
     return result
@@ -221,20 +210,33 @@ async def fetch_forecast(
         forecast_item = ForecastItem(
             forecast_date=dt.date(),
             forecast_hour=dt.hour,
-            temp_c=main.get("temp"),
-            temp_f=c_to_f(main.get("temp")),
-            condition=weather.get("main"),
-            icon=weather.get("icon"),
+            temp_c=main.get("temp", 0.0),
+            temp_f=c_to_f(main.get("temp")) or 0.0,
+            condition=weather.get("main", "Unknown"),
+            condition_desc=weather.get("description", ""),
+            icon=weather.get("icon", ""),
+            icon_url=icon_url(weather.get("icon", "")),
             precipitation=item.get("rain", {}).get("3h", 0) if "rain" in item else 0,
+            precipitation_type="rain" if "rain" in item else None,
             updated_at=dt,
+            uvi=None,
+            pressure=main.get("pressure"),
+            wind_speed=item.get("wind", {}).get("speed"),
+            wind_deg=item.get("wind", {}).get("deg"),
+            wind_gust=item.get("wind", {}).get("gust"),
+            humidity=main.get("humidity"),
+            visibility=item.get("visibility"),
+            weather_code=weather.get("id"),
         )
         forecast_list.append(forecast_item)
 
     result = ForecastResponse(
-        city=city_info.get("name"),
-        country=city_info.get("country"),
-        latitude=coord.get("lat"),
-        longitude=coord.get("lon"),
+        location=WeatherBase(
+            city=city_info.get("name"),
+            country=city_info.get("country"),
+            latitude=coord.get("lat"),
+            longitude=coord.get("lon"),
+        ),
         forecast=forecast_list,
     )
 
@@ -242,7 +244,6 @@ async def fetch_forecast(
     return result
 
 
-# If you need synchronous code, you can call it with asyncio.run()
 if __name__ == "__main__":
 
     async def main():

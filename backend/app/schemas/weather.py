@@ -4,17 +4,20 @@ from typing import List, Literal, Optional
 from pydantic import BaseModel
 
 # --------------------------
-# Weather "Current" Response
+# Location Metadata
 # --------------------------
 
 
 class WeatherBase(BaseModel):
-    city: Optional[str]  # Geocoding API로 보완
-    country: Optional[str]  # Geocoding API로 보완
-    latitude: float
-    longitude: float
+    city: Optional[str] = None
+    country: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
+# --------------------------
+# Weather Condition Detail
+# --------------------------
 class WeatherCondition(BaseModel):
     id: int  # weather code
     main: str  # e.g., "Clouds"
@@ -22,31 +25,48 @@ class WeatherCondition(BaseModel):
     icon: str  # e.g., "04d"
 
 
+# --------------------------
+# Current Weather Request/Response
+# --------------------------
+class WeatherRequest(BaseModel):
+    location: str
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+
+
 class WeatherCurrent(BaseModel):
     temp_c: float
     temp_f: float
     humidity: float
     wind_speed: float
-    wind_deg: Optional[float]
-    wind_gust: Optional[float]
-    condition: str  # e.g., "Clouds"
-    condition_desc: str  # e.g., "broken clouds"
-    icon: str  # e.g., "04d"
-    icon_url: Optional[str]  # 완성형 아이콘 URL (optional)
-    sunrise: Optional[datetime]
-    sunset: Optional[datetime]
-    pressure: Optional[float]
-    visibility: Optional[float]
-    precipitation: Optional[float]  # rain.1h or snow.1h 등
-    precipitation_type: Optional[Literal["rain", "snow"]]  # 강수 종류
-    uvi: Optional[float]
-    updated_at: datetime  # current.dt 기준
-    weather_code: Optional[int]  # weather.id
+    wind_deg: Optional[float] = None
+    wind_gust: Optional[float] = None
+    condition: str
+    condition_desc: str
+    icon: str
+    icon_url: Optional[str] = None
+    sunrise: Optional[datetime] = None
+    sunset: Optional[datetime] = None
+    pressure: Optional[float] = None
+    visibility: Optional[float] = None
+    precipitation: Optional[float] = None
+    precipitation_type: Optional[Literal["rain", "snow"]] = None
+    uvi: Optional[float] = None
+    weather_code: Optional[int] = None
+    updated_at: datetime
 
 
 class WeatherResponse(BaseModel):
     location: WeatherBase
     weather: WeatherCurrent
+
+
+class WeatherDetailResponse(BaseModel):
+    location: WeatherBase
+    weather: WeatherCurrent
+    tip: Optional[str] = None
+    api_source: Optional[str] = None
+    raw_response: Optional[dict] = None
 
 
 # --------------------------
@@ -62,17 +82,17 @@ class ForecastItem(BaseModel):
     condition: str
     condition_desc: str
     icon: str
-    icon_url: Optional[str]
-    precipitation: Optional[float]
-    precipitation_type: Optional[Literal["rain", "snow"]]
-    uvi: Optional[float]
-    pressure: Optional[float]
-    wind_speed: Optional[float]
-    wind_deg: Optional[float]
-    wind_gust: Optional[float]
-    humidity: Optional[float]
-    visibility: Optional[float]
-    weather_code: Optional[int]
+    icon_url: Optional[str] = None
+    precipitation: Optional[float] = None
+    precipitation_type: Optional[Literal["rain", "snow"]] = None
+    uvi: Optional[float] = None
+    pressure: Optional[float] = None
+    wind_speed: Optional[float] = None
+    wind_deg: Optional[float] = None
+    wind_gust: Optional[float] = None
+    humidity: Optional[float] = None
+    visibility: Optional[float] = None
+    weather_code: Optional[int] = None
     updated_at: datetime
 
 
@@ -94,24 +114,24 @@ class WeatherHistoryOut(BaseModel):
     temp_f: float
     humidity: float
     wind_speed: float
-    wind_deg: Optional[float]
-    wind_gust: Optional[float]
+    wind_deg: Optional[float] = None
+    wind_gust: Optional[float] = None
     condition: str
     condition_desc: str
     icon: str
-    icon_url: Optional[str]
-    sunrise: Optional[datetime]
-    sunset: Optional[datetime]
-    pressure: Optional[float]
-    visibility: Optional[float]
-    precipitation: Optional[float]
-    precipitation_type: Optional[Literal["rain", "snow"]]
-    uvi: Optional[float]
-    weather_code: Optional[int]
+    icon_url: Optional[str] = None
+    sunrise: Optional[datetime] = None
+    sunset: Optional[datetime] = None
+    pressure: Optional[float] = None
+    visibility: Optional[float] = None
+    precipitation: Optional[float] = None
+    precipitation_type: Optional[Literal["rain", "snow"]] = None
+    uvi: Optional[float] = None
+    weather_code: Optional[int] = None
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # --------------------------
@@ -126,18 +146,70 @@ class WeatherCreate(BaseModel):
     temp_f: float
     humidity: float
     wind_speed: float
-    wind_deg: Optional[float]
-    wind_gust: Optional[float]
+    wind_deg: Optional[float] = None
+    wind_gust: Optional[float] = None
     condition: str
     condition_desc: str
     icon: str
-    icon_url: Optional[str]
-    sunrise: Optional[datetime]
-    sunset: Optional[datetime]
-    pressure: Optional[float]
-    visibility: Optional[float]
-    precipitation: Optional[float]
-    precipitation_type: Optional[Literal["rain", "snow"]]
-    uvi: Optional[float]
-    weather_code: Optional[int]
+    sunrise: Optional[datetime] = None
+    sunset: Optional[datetime] = None
+    pressure: Optional[float] = None
+    visibility: Optional[float] = None
+    precipitation: Optional[float] = None
+    precipitation_type: Optional[Literal["rain", "snow"]] = None
+    uvi: Optional[float] = None
+    weather_code: Optional[int] = None
     updated_at: datetime
+
+
+class WeatherUpdate(BaseModel):
+    temp_c: Optional[float] = None
+    temp_f: Optional[float] = None
+    humidity: Optional[float] = None
+    wind_speed: Optional[float] = None
+    wind_deg: Optional[float] = None
+    wind_gust: Optional[float] = None
+    condition: Optional[str] = None
+    condition_desc: Optional[str] = None
+    icon: Optional[str] = None
+    sunrise: Optional[datetime] = None
+    sunset: Optional[datetime] = None
+    pressure: Optional[float] = None
+    visibility: Optional[float] = None
+    precipitation: Optional[float] = None
+    precipitation_type: Optional[Literal["rain", "snow"]] = None
+    uvi: Optional[float] = None
+    weather_code: Optional[int] = None
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# --------------------------
+# Summary / Tip of the Day
+# --------------------------
+
+
+class WeatherSummaryResponse(BaseModel):
+    tip: str
+    condition: str
+    icon: Optional[str] = None
+    location: WeatherBase
+    date: date
+
+
+class WeatherSearchHistoryItem(BaseModel):
+    query: str
+    searched_at: datetime
+
+
+class SavedLocation(BaseModel):
+    id: int
+    label: str
+    city: str
+    country: str
+    latitude: float
+    longitude: float
+    is_favorite: bool
+    created_at: datetime

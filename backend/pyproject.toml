@@ -3,6 +3,7 @@ name = "weather_project"
 version = "0.1.0"
 description = "Build a full-stack weather application that provides real-time weather information and a 5-day forecast based on user input or current location."
 authors = ["Nabin Kim <nabinkim0318@gmail.com>"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -14,11 +15,9 @@ requests = "^2.32.3"
 pytest = "^8.3.5"
 alembic = "^1.16.1"
 psycopg2-binary = "^2.9.10"
+rapidfuzz = "^3.6.1"
 
-[tool.poetry.group.dev.dependencies]
-httpx = "^0.24.1"
-uvicorn = {extras = ["standard"], version = "^0.34.2"}
-pre-commit = "^4.2.0"
+[tool.poetry.dev-dependencies]
 pytest = "^8.3.0"
 black = "^24.0.0"
 isort = "^5.13.2"
@@ -30,6 +29,16 @@ profile = "black"
 
 [tool.flake8]
 ignore = "E402"
+
+[tool.poetry.group.dev.dependencies]
+httpx = "^0.24.1"
+uvicorn = {extras = ["standard"], version = "^0.34.2"}
+pre-commit = "^4.2.0"
+black = "^24.0.0"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+coverage = "^7.5.0"
+pytest-asyncio = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]

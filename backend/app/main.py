@@ -1,24 +1,25 @@
 import logging
 import os
 
+# Load .env file safely
+from pathlib import Path as FilePath
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from app import models
 from app.api import export, integrations, search_location, weather
 from app.db.database import Base, engine
-
-# from app.models.export import ExportHistory
 from app.utils.errors import register_exception_handlers
 
-# from app.models import user, user_location
-# from app.services import user_location as svc
+# TODO: Integrate user-related services
 
 
-load_dotenv(
-    dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
-)
+try:
+    env_path = FilePath(__file__).resolve().parent.parent / ".env"
+    load_dotenv(dotenv_path=env_path)
+except Exception as e:
+    logging.warning(f"Could not load .env file: {e}")
 
 # --- Logging Setup ---
 logging.basicConfig(
@@ -39,16 +40,24 @@ app = FastAPI(
         "and export features"
     ),
     version="1.0.0",
+    openapi_tags=[
+        {"name": "Weather", "description": "Endpoints for weather data and forecasts"},
+        {"name": "Location", "description": "Location search and aliases"},
+        {"name": "Export", "description": "Export weather data in various formats"},
+        {
+            "name": "Integrations",
+            "description": "3rd-party integrations like maps, YouTube",
+        },
+    ],
 )
 
 # --- Register Global Exception Handlers ---
 register_exception_handlers(app)
 
 # --- CORS Settings ---
-origins = [
-    "http://localhost",
-    "http://localhost:3000",  # React dev Server Address
-]
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost,http://localhost:3000").split(
+    ","
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -70,3 +79,9 @@ app.include_router(
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Weather App API"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)

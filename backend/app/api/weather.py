@@ -44,134 +44,107 @@ This module is a core part of the backend service enabling users and clients to
 query, store, and manage weather-related information effectively.
 """
 
-from datetime import date
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
 
-# from fastapi import  Body, Path, status
-from pydantic import BaseModel, field_validator  # Field
+from app.db.database import get_db
+from app.schemas.weather import (
+    ForecastResponse,
+    WeatherCreate,
+    WeatherCurrent,
+    WeatherUpdate,
+)
+from app.services.weather_service import (
+    fetch_current_weather,
+    fetch_forecast,
+    get_weather_tip,
+)
+from crud import weather as crud
 
-from app.services.weather_service import fetch_current_weather  # fetch_forecast,
-
-# from app.services.weather_service import (
-#     delete_weather_data,
-#     get_forecast_data,
-#     get_weather_by_id,
-#     save_weather_data,
-#     update_weather_data,
-# )
-
-router = APIRouter()
-
-
-# --- Pydantic Schema Example -
-
-
-class WeatherCreateRequest(BaseModel):
-    city: Optional[str]
-    lat: Optional[float]
-    lon: Optional[float]
-    start_date: Optional[date]
-    end_date: Optional[date]
-
-    @field_validator("start_date", "end_date")
-    @classmethod
-    def valid_dates(cls, v):
-        if v and v > date.today():
-            raise ValueError("Date cannot be in the future")
-        return v
-
-    @field_validator("end_date")
-    @classmethod
-    def check_date_range(cls, v, values):
-        if "start_date" in values.data and values.data["start_date"] and v:
-            if v < values.data["start_date"]:
-                raise ValueError("end_date must be after start_date")
-        return v
+router = APIRouter(tags=["Weather"])
 
 
-class WeatherResponse(BaseModel):
-    id: int
-    city: str
-    lat: float
-    lon: float
-    date: date
-    temperature: float
-    condition: str
-
-
-class ForecastResponse(BaseModel):
-    city: str
-    lat: float
-    lon: float
-    forecast: List[WeatherResponse]
-
-
-# --- Endpoint Implementation ---
-
-
-@router.get("/weather/current", response_model=WeatherResponse)
-def get_current_weather(
+@router.get("/current", response_model=WeatherCurrent)
+async def get_current_weather(
     city: Optional[str] = Query(None),
     lat: Optional[float] = Query(None),
     lon: Optional[float] = Query(None),
 ):
-    result = fetch_current_weather(city, lat, lon)
-    if not result:
-        raise HTTPException(status_code=404, detail="Weather not found.")
-    return result
+    try:
+        result = await fetch_current_weather(city=city, lat=lat, lon=lon)
+        if not result:
+            raise HTTPException(status_code=404, detail="Weather data not found")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-# @router.post(
-#     "/weather", response_model=WeatherResponse, status_code=status.HTTP_201_CREATED
-# )
-# def create_weather(data: WeatherCreateRequest = Body(...)):
-#     # Fetch weather data from external API and save to DB
-#     saved = save_weather_data(data)
-#     if not saved:
-#         raise HTTPException(status_code=500, detail="Failed to save weather data.")
-#     return saved
+@router.get("/forecast", response_model=ForecastResponse)
+async def get_forecast(
+    city: Optional[str] = Query(None),
+    lat: Optional[float] = Query(None),
+    lon: Optional[float] = Query(None),
+    db: Session = Depends(get_db),
+):
+    try:
+        result = await fetch_forecast(city=city, lat=lat, lon=lon)
+        if not result:
+            raise HTTPException(status_code=404, detail="Forecast not available")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-# @router.get("/weather/{weather_id}", response_model=WeatherResponse)
-# def read_weather(weather_id: int = Path(..., gt=0)):
-#     data = get_weather_by_id(weather_id)
-#     if not data:
-#         raise HTTPException(status_code=404, detail="Weather record not found.")
-#     return data
+@router.post("", response_model=dict)
+def store_weather(data: WeatherCreate, db: Session = Depends(get_db)):
+    try:
+        record = crud.create_weather_record(db, data)
+        return {"id": record.id, "message": "Weather data stored."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-# @router.put("/weather/{weather_id}", response_model=WeatherResponse)
-# def update_weather(weather_id: int, data: WeatherCreateRequest):
-#     updated = update_weather_data(weather_id, data)
-#     if not updated:
-#         raise HTTPException(
-#             status_code=404, detail="Weather record not found or update failed."
-#         )
-#     return updated
+@router.get("/history", response_model=List[str])
+def get_weather_history(user_id: int, db: Session = Depends(get_db)):
+    history = crud.get_search_history(db, user_id)
+    return [h.query for h in history]
 
 
-# @router.delete("/weather/{weather_id}", status_code=status.HTTP_204_NO_CONTENT)
-# def delete_weather(weather_id: int):
-#     success = delete_weather_data(weather_id)
-#     if not success:
-#         raise HTTPException(status_code=404, detail="Weather record not found.")
-#     return None
+@router.get("/summary", response_model=dict)
+async def weather_tip(city: Optional[str] = Query(None)):
+    result = await fetch_current_weather(city=city)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Weather data not found.")
+    tip = get_weather_tip(result.condition)
+    return {"tip": tip}
 
 
-# @router.get("/forecast", response_model=ForecastResponse)
-# def get_forecast(
-#     city: Optional[str] = Query(None),
-#     lat: Optional[float] = Query(None),
-#     lon: Optional[float] = Query(None),
-#     start_date: Optional[date] = Query(None),
-#     end_date: Optional[date] = Query(None),
-#     page: int = Query(1, ge=1),
-#     page_size: int = Query(10, ge=1, le=100),
-# ):
-#     forecast = get_forecast_data(city, lat, lon, start_date,
-#                               end_date, page, page_size)
-#     if not forecast:
-#         raise HTTPException(status_code=404, detail="Forecast not found.")
-#     return forecast
+@router.get("/airquality", response_model=dict)
+def dummy_air_quality():
+    return {"message": "Air quality endpoint not implemented yet."}
+
+
+@router.get("/{weather_id}", response_model=WeatherCreate)
+def get_weather_by_id(weather_id: int, db: Session = Depends(get_db)):
+    weather = crud.get_weather_by_id(db, weather_id)
+    if not weather:
+        raise HTTPException(status_code=404, detail="Weather record not found")
+    return weather
+
+
+@router.put("/{weather_id}", response_model=WeatherCreate)
+def update_weather(weather_id: int, data: WeatherUpdate, db: Session = Depends(get_db)):
+    updated = crud.update_weather_record(db, weather_id, data)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Update failed; record not found")
+    return updated
+
+
+@router.delete("/{weather_id}", response_model=dict)
+def delete_weather(weather_id: int, db: Session = Depends(get_db)):
+    success = crud.delete_weather_record(db, weather_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Deletion failed; record not found")
+    return {"message": "Record deleted successfully."}

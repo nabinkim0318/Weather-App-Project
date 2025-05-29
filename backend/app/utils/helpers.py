@@ -44,3 +44,18 @@ Benefits:
 - Enhances code readability by abstracting complex or repetitive tasks.
 - Facilitates consistent data formatting and processing standards across modules.
 """
+
+
+def get_weather_tip(condition: str) -> str:
+    tip_map = {
+        "Rain": "Bring an umbrella ☔️",
+        "Snow": "Wear warm clothes ❄️",
+        "Clear": "Perfect day for a walk 🌞",
+        "Clouds": "Might be gloomy, stay productive ☁️",
+        "Thunderstorm": "Stay indoors and safe ⛈️",
+    }
+    return tip_map.get(condition, "Stay prepared and check the forecast!")
+
+
+def icon_url(icon_code: str) -> str:
+    return f"/static/icons/{icon_code}.svg"
