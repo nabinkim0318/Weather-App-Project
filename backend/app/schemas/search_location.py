@@ -23,81 +23,26 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class BaseLocation(BaseModel):
-    """
-    Base schema containing shared location fields.
-
-    Used by CreateLocationRequest and LocationResponse for reusability and consistency.
-    """
-
-    label: str = Field(
-        ..., max_length=100, description="User-given name for location (e.g., 'Home')"
-    )
-    city: str = Field(..., max_length=100, description="City name")
-    state: Optional[str] = Field(
-        None, max_length=100, description="State or province (optional)"
-    )
-    country: str = Field(..., max_length=100, description="Country name")
-    postal_code: Optional[str] = Field(
-        None, max_length=20, description="Zip or postal code (optional)"
-    )
-    latitude: float = Field(..., ge=-90, le=90, description="Latitude (-90 to 90)")
-    longitude: float = Field(
-        ..., ge=-180, le=180, description="Longitude (-180 to 180)"
-    )
+class SearchLocationBase(BaseModel):
+    label: Optional[str] = None
+    city: str
+    state: Optional[str] = None
+    country: str
+    postal_code: Optional[str] = None
+    latitude: float
+    longitude: float
 
 
-class CreateLocationRequest(BaseLocation):
-    """
-    Schema for creating a new location entry.
-
-    Extends BaseLocation and adds the `is_favorite` flag.
-    """
-
-    is_favorite: bool = Field(False, description="Mark location as favorite")
+class SearchLocationCreate(SearchLocationBase):
+    pass
 
 
-class UpdateLocationRequest(BaseModel):
-    """
-    Schema for partially updating an existing location.
-
-    All fields are optional to allow selective updates.
-    """
-
-    label: Optional[str] = Field(
-        None, max_length=100, description="Updated location label"
-    )
-    is_favorite: Optional[bool] = Field(
-        None, description="Set to true to mark as favorite"
-    )
-    city: Optional[str] = Field(None, max_length=100, description="Updated city name")
-    state: Optional[str] = Field(
-        None, max_length=100, description="Updated state or province"
-    )
-    country: Optional[str] = Field(
-        None, max_length=100, description="Updated country name"
-    )
-    postal_code: Optional[str] = Field(
-        None, max_length=20, description="Updated postal code"
-    )
-    latitude: Optional[float] = Field(
-        None, ge=-90, le=90, description="Updated latitude"
-    )
-    longitude: Optional[float] = Field(
-        None, ge=-180, le=180, description="Updated longitude"
-    )
+class SearchLocationUpdate(SearchLocationBase):
+    pass
 
 
-class LocationResponse(BaseLocation):
-    """
-    Schema for returning saved location data to the client.
-
-    Includes metadata such as ID, user association, and creation timestamp.
-    """
-
+class SearchLocationResponse(SearchLocationBase):
     id: int
-    user_id: Optional[int]
-    is_favorite: bool
     created_at: datetime
 
     class Config:
@@ -110,3 +55,26 @@ class FavoriteToggleRequest(BaseModel):
     """
 
     is_favorite: bool = Field(..., description="Set to true to mark as favorite")
+
+
+class LocationBase(BaseModel):
+    city: str
+    state: Optional[str] = None
+    country: str
+    postal_code: Optional[str] = None
+    latitude: float
+    longitude: float
+
+
+class LocationCreate(LocationBase):
+    label: str
+    user_id: Optional[int] = None
+
+
+class SearchHistoryResponse(BaseModel):
+    id: int
+    query: str
+    searched_at: datetime
+
+    class Config:
+        from_attributes = True

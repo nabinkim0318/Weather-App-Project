@@ -39,7 +39,7 @@ import datetime
 
 from sqlalchemy import JSON, Column, DateTime, Integer, String  # ForeignKey
 
-from app.db.database import Base
+from app.core.database import Base
 
 # from sqlalchemy.orm import relationship
 
@@ -49,6 +49,7 @@ from app.db.database import Base
 
 class ExportHistory(Base):
     __tablename__ = "export_history"
+    __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
     # user_id = Column(Integer, ForeignKey("users.id"), nullable=True)

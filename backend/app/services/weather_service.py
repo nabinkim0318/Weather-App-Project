@@ -55,6 +55,8 @@ from rapidfuzz import process
 from app.schemas.weather import (
     ForecastItem,
     ForecastResponse,
+    HourlyWeather,
+    HourlyWeatherResponse,
     WeatherBase,
     WeatherCurrent,
 )
@@ -242,6 +244,76 @@ async def fetch_forecast(
 
     _cache[cache_key] = {"timestamp": datetime.utcnow(), "data": result}
     return result
+
+
+async def fetch_hourly_weather(
+    city: Optional[str] = None,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None,
+) -> Optional[HourlyWeatherResponse]:
+    """
+    Fetch hourly weather forecast for the next 5 hours.
+    Returns None if the data could not be fetched.
+    """
+    if not (city or (lat is not None and lon is not None)):
+        raise ValueError("Either city or coordinates must be provided")
+
+    params = {"appid": OPENWEATHER_API_KEY, "units": "metric"}
+    if city:
+        params["q"] = normalize_city_name(city)
+    else:
+        params["lat"] = lat
+        params["lon"] = lon
+
+    cache_key = _build_cache_key("hourly", **params)
+    cached = _cache.get(cache_key)
+    if cached and datetime.utcnow() - cached["timestamp"] < timedelta(minutes=10):
+        return cached["data"]
+
+    try:
+        data = await fetch_url(BASE_FORECAST_URL, params)
+        if not data:
+            return None
+
+        # Extract location name
+        location = data["city"]["name"]
+
+        # Process the next 5 hours of forecast
+        hourly_forecast = []
+        for item in data["list"][:5]:  # Get first 5 items
+            timestamp = item["dt"]
+            temp = item["main"]["temp"]
+            condition = item["weather"][0]["main"]
+            description = item["weather"][0]["description"]
+            icon = item["weather"][0]["icon"]
+
+            # Format hour (e.g., "14:00")
+            forecast_time = datetime.fromtimestamp(timestamp)
+            hour = forecast_time.strftime("%H:%M")
+
+            hourly_forecast.append(
+                HourlyWeather(
+                    hour=hour,
+                    timestamp=timestamp,
+                    temperature=temp,
+                    condition=condition,
+                    description=description,
+                    icon=icon,
+                )
+            )
+
+        result = HourlyWeatherResponse(
+            location=location, hourly_forecast=hourly_forecast
+        )
+
+        _cache[cache_key] = {"timestamp": datetime.utcnow(), "data": result}
+        return result
+
+    except Exception as e:
+        print(f"Error fetching hourly weather: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch hourly weather data: {str(e)}"
+        )
 
 
 if __name__ == "__main__":

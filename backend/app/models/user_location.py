@@ -4,11 +4,12 @@ from sqlalchemy import TIMESTAMP, Boolean, Column, Float, ForeignKey, Integer, S
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from app.db.database import Base
+from app.core.database import Base
 
 
 class UserLocation(Base):
     __tablename__ = "user_locations"
+    __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)

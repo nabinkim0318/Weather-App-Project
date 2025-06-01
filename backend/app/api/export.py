@@ -55,7 +55,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
+from app.core.database import get_db
 from app.models.export import ExportHistory
 from app.schemas.export import (  # ExportHistoryUpdate,
     ExportHistoryCreate,

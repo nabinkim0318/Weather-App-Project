@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import export, integrations, search_location, weather
-from app.db.database import Base, engine
+from app.api import export, integrations, search_location, weather, weather_history
+from app.core.database import Base, engine
 from app.utils.errors import register_exception_handlers
 
 # TODO: Integrate user-related services
@@ -73,6 +73,9 @@ app.include_router(search_location.router, prefix="/api/location", tags=["Locati
 app.include_router(export.router, prefix="/api/export", tags=["Export"])
 app.include_router(
     integrations.router, prefix="/api/integrations", tags=["Integrations"]
+)
+app.include_router(
+    weather_history.router, prefix="/api/weather-history", tags=["Weather History"]
 )
 
 

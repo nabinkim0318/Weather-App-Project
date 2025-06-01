@@ -1,5 +1,5 @@
 # backend/app/db/init_db.py
-from app.db.database import Base, engine
+from app.core.database import Base, engine
 
 # from app.models.export import ExportHistory  # Add other models too
 
