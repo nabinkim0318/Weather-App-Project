@@ -1,44 +1,34 @@
 import logging
 import os
-
-# Load .env file safely
 from pathlib import Path as FilePath
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# Import your internal modules here
 from app.api import export, integrations, search_location, weather, weather_history
 from app.core.database import Base, engine
 from app.utils.errors import register_exception_handlers
 
-# TODO: Integrate user-related services
-
-
+# Load environment variables
 try:
     env_path = FilePath(__file__).resolve().parent.parent / ".env"
     load_dotenv(dotenv_path=env_path)
 except Exception as e:
     logging.warning(f"Could not load .env file: {e}")
 
-# --- Logging Setup ---
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler()],
-)
+# Logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# --- Create DB Tables ---
+# Create DB tables
 Base.metadata.create_all(bind=engine)
 
-# --- Create FastAPI App ---
+# ✅ FastAPI instance (this must be exposed at top-level)
 app = FastAPI(
     title="Weather App API",
-    description=(
-        "API for Weather App with CRUD, external API integration, "
-        "and export features"
-    ),
+    description="API for Weather App with API integration",
     version="1.0.0",
     openapi_tags=[
         {"name": "Weather", "description": "Endpoints for weather data and forecasts"},
@@ -51,10 +41,10 @@ app = FastAPI(
     ],
 )
 
-# --- Register Global Exception Handlers ---
+# Global exception handling
 register_exception_handlers(app)
 
-# --- CORS Settings ---
+# CORS
 origins = os.getenv("ALLOWED_ORIGINS", "http://localhost,http://localhost:3000").split(
     ","
 )
@@ -67,7 +57,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Register API Routers ---
+# Include routers
 app.include_router(weather.router, prefix="/api/weather", tags=["Weather"])
 app.include_router(search_location.router, prefix="/api/location", tags=["Location"])
 app.include_router(export.router, prefix="/api/export", tags=["Export"])
@@ -79,12 +69,7 @@ app.include_router(
 )
 
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to the Weather App API"}
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+# ✅ A simple default endpoint (test용)
+@app.get("/api/hello")
+async def hello():
+    return {"message": "Hello from Vercel FastAPI 🎉"}
