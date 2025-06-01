@@ -4,13 +4,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.core.config import settings
+from app.core.config import get_database_url
 
-# Database URL
-DATABASE_URL = (
-    f"postgresql://{settings.postgres_user}:{settings.postgres_password}"
-    f"@{settings.postgres_host}:{settings.postgres_port}/{settings.postgres_db}"
-)
+# Get database URL from config (respects DATABASE_URL env var)
+DATABASE_URL = get_database_url()
 
 # Create SQLAlchemy engine
 engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=5, max_overflow=10)
