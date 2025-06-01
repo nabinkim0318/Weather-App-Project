@@ -27,3 +27,5 @@ build/
 
 __pycache__/
 *.pyc
+
+echo ".env" >> backend/.gitignore

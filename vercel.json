@@ -5,14 +5,14 @@
         "use": "@vercel/static-build"
       },
       {
-        "src": "backend/app/main.py",
+        "src": "api/weather.py",
         "use": "@vercel/python"
       }
     ],
     "routes": [
       {
         "src": "/api/(.*)",
-        "dest": "backend/app/main.py"
+        "dest": "api/weather.py"
       },
       {
         "src": "/(.*)",
