@@ -1,14 +1,34 @@
 {
-  "builds": [
-    {
-      "src": "my-app/package.json",
-      "use": "@vercel/static-build"
+    "builds": [
+      {
+        "src": "my-app/package.json",
+        "use": "@vercel/static-build"
+      },
+      {
+        "src": "backend/app/main.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "backend/app/main.py"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "my-app/build/$1"
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/(.*)",
+        "destination": "/"
+      }
+    ],
+    "env": {
+      "OPENWEATHER_API_KEY": "@openweather_api_key",
+      "YOUTUBE_API_KEY": "@youtube_api_key",
+      "GOOGLE_MAPS_API_KEY": "@google_maps_api_key"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "my-app/build/$1"
-    }
-  ]
-}
+  }
+  
