@@ -1,8 +1,10 @@
-[tool.poetry]
+[project]
 name = "weather_project"
 version = "0.1.0"
 description = "Build a full-stack weather application that provides real-time weather information and a 5-day forecast based on user input or current location."
-authors = ["Nabin Kim <nabinkim0318@gmail.com>"]
+authors = [{ name = "Nabin Kim", email = "nabinkim0318@gmail.com" }]
+
+[tool.poetry]
 package-mode = false
 
 [tool.poetry.dependencies]
@@ -16,19 +18,7 @@ pytest = "^8.3.5"
 alembic = "^1.16.1"
 psycopg2-binary = "^2.9.10"
 rapidfuzz = "^3.6.1"
-
-[tool.poetry.dev-dependencies]
-pytest = "^8.3.0"
-black = "^24.0.0"
-isort = "^5.13.2"
-flake8 = "^7.0.0"
-coverage = "^7.5.0"
-
-[tool.isort]
-profile = "black"
-
-[tool.flake8]
-ignore = "E402"
+pydantic-settings = "^2.9.1"
 
 [tool.poetry.group.dev.dependencies]
 httpx = "^0.24.1"
@@ -39,6 +29,12 @@ isort = "^5.13.2"
 flake8 = "^7.0.0"
 coverage = "^7.5.0"
 pytest-asyncio = "^1.0.0"
+
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+ignore = "E402"
 
 [build-system]
 requires = ["poetry-core"]
