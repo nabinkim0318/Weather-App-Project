@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import * as echarts from 'echarts';
 import type { EChartsOption } from 'echarts';
 
+// API Configuration
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 interface YouTubeVideo {
     videoId: string;
     title: string;
@@ -154,7 +157,7 @@ function App(): React.ReactElement {
         // Only run auto-complete search if input is 3+ characters
         if (value.length > 2) {
             try {
-                const response = await fetch('/api/location/search', {
+                const response = await fetch(`${API_BASE_URL}/api/location/search`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -194,7 +197,7 @@ function App(): React.ReactElement {
             setShowSearchResults(false);
 
             await Promise.all([
-                fetch(`/api/location/weather?user_input=${encodeURIComponent(location)}`).then(async (response) => {
+                fetch(`${API_BASE_URL}/api/location/weather?user_input=${encodeURIComponent(location)}`).then(async (response) => {
                     if (!response.ok) {
                         // 400 error (invalid zip code, etc.)
                         if (response.status === 400) {
@@ -207,7 +210,7 @@ function App(): React.ReactElement {
                     setWeatherData(data);
                     return data;
                 }),
-                fetch(`/api/weather/forecast?city=${encodeURIComponent(location)}`).then(async (response) => {
+                fetch(`${API_BASE_URL}/api/weather/forecast?city=${encodeURIComponent(location)}`).then(async (response) => {
                     if (!response.ok) {
                         // forecast API only supports city, so ignore zip code errors
                         if (response.status === 400) {
@@ -258,8 +261,8 @@ function App(): React.ReactElement {
 
                     // Get weather and forecast data in parallel
                     const [weatherResponse, forecastResponse] = await Promise.all([
-                        fetch(`/api/location/weather?user_input=${latitude},${longitude}`),
-                        fetch(`/api/weather/forecast?lat=${latitude}&lon=${longitude}`)
+                        fetch(`${API_BASE_URL}/api/location/weather?user_input=${latitude},${longitude}`),
+                        fetch(`${API_BASE_URL}/api/weather/forecast?lat=${latitude}&lon=${longitude}`)
                     ]);
 
                     console.log('Weather API Response:', {
@@ -450,7 +453,7 @@ function App(): React.ReactElement {
     // Get YouTube Videos
     const fetchYouTubeVideos = async (city: string) => {
         try {
-            const response = await fetch(`/api/integrations/youtube?city=${encodeURIComponent(city)}`);
+            const response = await fetch(`${API_BASE_URL}/api/integrations/youtube?city=${encodeURIComponent(city)}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch videos');
             }
@@ -472,7 +475,7 @@ function App(): React.ReactElement {
     // Get Map Data
     const fetchMapData = async (city: string, lat?: number, lon?: number) => {
         try {
-            let url = '/api/integrations/map';
+            let url = `${API_BASE_URL}/api/integrations/map`;
             if (lat && lon) {
                 url += `?lat=${lat}&lon=${lon}`;
             } else {
@@ -510,7 +513,7 @@ function App(): React.ReactElement {
     // Add fetchHourlyWeather function
     const fetchHourlyWeather = async (location: string) => {
         try {
-            const response = await fetch(`/api/weather/hourly?city=${encodeURIComponent(location)}`);
+            const response = await fetch(`${API_BASE_URL}/api/weather/hourly?city=${encodeURIComponent(location)}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch hourly weather data');
             }
@@ -642,7 +645,7 @@ function App(): React.ReactElement {
     const fetchWeatherData = async (location: string) => {
         try {
             setWeatherError(null);
-            const response = await fetch(`/api/location/weather?user_input=${encodeURIComponent(location)}`);
+            const response = await fetch(`${API_BASE_URL}/api/location/weather?user_input=${encodeURIComponent(location)}`);
             console.log('Weather API response:', response);
             
             if (!response.ok) {
@@ -664,7 +667,7 @@ function App(): React.ReactElement {
         try {
             setForecastError(null);
             console.log('Fetching forecast for location:', location);
-            const response = await fetch(`/api/weather/forecast?city=${encodeURIComponent(location)}`);
+            const response = await fetch(`${API_BASE_URL}/api/weather/forecast?city=${encodeURIComponent(location)}`);
             console.log('Forecast API response:', response);
             
             if (!response.ok) {
@@ -722,7 +725,7 @@ function App(): React.ReactElement {
             setHistoryError(null);
 
             // Changed to GET method and using query parameters
-            const response = await fetch(`/api/weather-history/location/${historySearch.location}?start_date=${encodeURIComponent(historySearch.startDate)}&end_date=${encodeURIComponent(historySearch.endDate)}`);
+            const response = await fetch(`${API_BASE_URL}/api/weather-history/location/${historySearch.location}?start_date=${encodeURIComponent(historySearch.startDate)}&end_date=${encodeURIComponent(historySearch.endDate)}`);
 
             if (!response.ok) {
                 throw new Error('Failed to fetch weather history.');
